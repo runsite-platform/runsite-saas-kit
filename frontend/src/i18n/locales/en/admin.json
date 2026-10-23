@@ -1,0 +1,203 @@
+{
+  "title": "{{brand}} admin",
+  "nav": {
+    "label": "Admin sections",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "organizations": "Organizations",
+    "setup": "Setup",
+    "back_to_app": "Back to app"
+  },
+  "menu": {
+    "admin_panel": "Admin panel"
+  },
+  "common": {
+    "loading": "Loading…",
+    "search": "Search",
+    "previous": "Previous",
+    "next": "Next",
+    "page_of": "Page {{page}} of {{total}}",
+    "empty": "Nothing found.",
+    "back": "Back",
+    "never": "Never",
+    "yes": "Yes",
+    "no": "No",
+    "not_set": "Not set"
+  },
+  "roles": {
+    "user": "User",
+    "admin": "Admin",
+    "superadmin": "Superadmin"
+  },
+  "org_roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "member": "Member"
+  },
+  "plans": {
+    "free": "Free",
+    "pro": "Pro"
+  },
+  "statuses": {
+    "active": "Active",
+    "blocked": "Blocked",
+    "unverified": "Unverified"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Revenue and growth across the whole platform",
+    "mrr": "Monthly recurring revenue",
+    "mrr_hint": "Active subscriptions; yearly plans count as 1/12 per month",
+    "active_subscriptions": "Active subscriptions",
+    "past_due_hint": "{{count}} past due",
+    "trialing_subscriptions": "In trial",
+    "conversion": "Trial to paid",
+    "conversion_hint": "{{converted}} of {{ended}} ended trials, last {{days}} days",
+    "churned": "Churned",
+    "churned_hint": "Canceled or expired in the last 30 days",
+    "total_users": "Users",
+    "total_organizations": "Organizations",
+    "signups": "Sign-ups per day",
+    "signups_series": "Sign-ups",
+    "new_organizations": "New organizations per day",
+    "new_organizations_series": "Organizations"
+  },
+  "users": {
+    "title": "Users",
+    "search_placeholder": "Search by email or name",
+    "columns": {
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "status": "Status",
+      "joined": "Joined"
+    },
+    "detail": {
+      "joined": "Joined",
+      "last_login": "Last login",
+      "password": "Password set",
+      "google": "Google linked",
+      "memberships": "Organizations",
+      "no_memberships": "Not a member of any organization.",
+      "actions": "Actions"
+    },
+    "actions": {
+      "block": "Block",
+      "unblock": "Unblock",
+      "resend_verification": "Resend verification email",
+      "grant_admin": "Make admin",
+      "revoke_admin": "Remove admin",
+      "impersonate": "Impersonate"
+    },
+    "confirm": {
+      "block": "Block {{email}}? They are signed out on every device.",
+      "impersonate": "Sign in as {{email}} for 30 minutes?"
+    },
+    "notices": {
+      "verification_sent": "Verification email sent.",
+      "already_verified": "This email is already verified.",
+      "saved": "Saved."
+    }
+  },
+  "organizations": {
+    "title": "Organizations",
+    "search_placeholder": "Search by name or slug",
+    "plan_filter": "Plan",
+    "all_plans": "All plans",
+    "override_badge": "Override",
+    "columns": {
+      "name": "Name",
+      "slug": "Slug",
+      "plan": "Plan",
+      "owner": "Owner",
+      "members": "Members",
+      "created": "Created"
+    },
+    "detail": {
+      "members": "Members",
+      "subscription": "Subscription",
+      "no_subscription": "No subscription.",
+      "payments": "Recent payments",
+      "no_payments": "No payments yet.",
+      "provider": "Provider",
+      "status": "Status",
+      "interval": "Interval",
+      "period_end": "Current period ends",
+      "trial_ends": "Trial ends",
+      "cancel_at_period_end": "Cancels at period end",
+      "amount": "Amount",
+      "paid_at": "Paid",
+      "invoice": "Invoice",
+      "open_invoice": "Open"
+    },
+    "override": {
+      "title": "Plan override",
+      "description": "An override wins over the subscription until you remove it.",
+      "current_reason": "Current reason: {{reason}}",
+      "plan": "Plan",
+      "no_override": "No override (follow the subscription)",
+      "reason": "Reason",
+      "reason_invalid": "Write a reason between 3 and 500 characters.",
+      "submit": "Save override",
+      "saved": "Plan override saved."
+    }
+  },
+  "setup": {
+    "title": "Setup checklist",
+    "subtitle": "What is configured in this deployment",
+    "docs": "Docs",
+    "status": {
+      "ok": "Configured",
+      "missing": "Not configured",
+      "warning": "Needs attention",
+      "manual": "Check manually"
+    },
+    "items": {
+      "email_api_key": {
+        "title": "Email API key",
+        "description": "EMAIL_API_KEY sends verification, reset and invitation emails. Without it emails are only logged."
+      },
+      "sender_domain": {
+        "title": "Verified sender domain",
+        "description": "Until the sender domain is verified, the email service runs in sandbox mode. Check it in the Runsite dashboard."
+      },
+      "email_verification": {
+        "title": "Require email verification",
+        "description": "Turn on REQUIRE_EMAIL_VERIFICATION after the sender domain is verified."
+      },
+      "billing_provider": {
+        "title": "Billing provider",
+        "description": "BILLING_PROVIDER and its API credentials. Without them everyone stays on Free."
+      },
+      "billing_price_ids": {
+        "title": "Price IDs",
+        "description": "Monthly and yearly price, variant or product IDs for the active provider."
+      },
+      "billing_webhook_secret": {
+        "title": "Webhook secret",
+        "description": "Signing secret for the billing webhook endpoint."
+      },
+      "google_oauth": {
+        "title": "Google sign-in",
+        "description": "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET show the Google button on the login page."
+      },
+      "storage": {
+        "title": "File storage",
+        "description": "S3 credentials and bucket enable file uploads, avatars and logos."
+      },
+      "storage_delete_key": {
+        "title": "Storage delete key",
+        "description": "Keys created by a Runsite template can delete objects. Set S3_DELETE_* only if the bucket is attached through a dashboard connection, whose key cannot delete; otherwise deleted files stay in the bucket (see the logs)."
+      },
+      "superadmin": {
+        "title": "Superadmin",
+        "description": "Set SUPERADMIN_EMAIL or run python -m app.cli create-superadmin."
+      }
+    }
+  },
+  "impersonation": {
+    "banner": "You are signed in as {{email}} through impersonation.",
+    "stop": "Stop impersonating",
+    "stopping": "Restoring your session…"
+  }
+}

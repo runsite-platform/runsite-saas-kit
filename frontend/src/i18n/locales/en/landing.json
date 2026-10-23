@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "features": "What's inside",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "login": "Log in",
+    "register": "Get started"
+  },
+  "hero": {
+    "title": "Launch {{brandName}} without rebuilding the boring parts",
+    "subtitle": "Accounts, teams, billing, file uploads and an admin panel are already built and tested. Spend your time on the feature your customers pay for.",
+    "primaryCta": "Start for free",
+    "secondaryCta": "See what's inside",
+    "stack": "FastAPI, React 19, PostgreSQL and Tailwind CSS. Open source under the MIT license."
+  },
+  "preview": {
+    "windowLabel": "Preview of the app your customers see after signing in",
+    "url": "app.{{brandName}}.com",
+    "organization": "Northwind",
+    "plan": "Pro trial",
+    "trialLeft": "12 days left",
+    "upgrade": "Upgrade",
+    "nav": {
+      "overview": "Overview",
+      "projects": "Projects",
+      "files": "Files",
+      "members": "Members",
+      "billing": "Billing",
+      "admin": "Admin"
+    },
+    "greeting": "Good morning, Dana",
+    "verified": "Verified",
+    "stats": {
+      "projects": "Projects",
+      "members": "Members",
+      "storage": "Storage used"
+    },
+    "chartTitle": "Projects created per day",
+    "projectsTitle": "Recent projects",
+    "projectNames": {
+      "first": "Website redesign",
+      "second": "Q4 onboarding",
+      "third": "Mobile app beta"
+    },
+    "storageOf": "64 of 100 MB"
+  },
+  "features": {
+    "title": "Everything around your product, ready on day one",
+    "subtitle": "Pick a part of the kit to see where it lives in the app your customers sign in to.",
+    "auth": {
+      "title": "Authentication",
+      "description": "Email and password, Google login, email verification, password reset and secure refresh tokens."
+    },
+    "organizations": {
+      "title": "Organizations and teams",
+      "description": "Workspaces with owner, admin and member roles, invitations by email or link, and an organization switcher."
+    },
+    "billing": {
+      "title": "Subscriptions",
+      "description": "Plans, trials and limits with Stripe, Lemon Squeezy or Creem. Switch providers with one environment variable."
+    },
+    "dashboard": {
+      "title": "Dashboard and charts",
+      "description": "An overview with usage stats and charts that your customers see as soon as they sign in."
+    },
+    "files": {
+      "title": "File uploads",
+      "description": "Uploads to S3-compatible storage with per-plan storage limits, avatars and organization logos."
+    },
+    "admin": {
+      "title": "Admin panel",
+      "description": "Users, organizations, MRR and trial metrics, plan overrides, impersonation and a setup checklist."
+    },
+    "modules": {
+      "title": "Example module",
+      "description": "A complete projects module to copy when you add your own features, from database to page."
+    },
+    "theming": {
+      "title": "Branding and themes",
+      "description": "Your name, logo and colours in one place, light and dark themes, and every string ready for translation."
+    },
+    "listLabel": "Parts of the kit"
+  },
+  "steps": {
+    "title": "From zero to a working product in an afternoon",
+    "subtitle": "No boilerplate to assemble. Deploy the template, make it yours, then build the part only you can build.",
+    "deploy": {
+      "title": "Deploy the template",
+      "description": "Runsite creates the web service, a PostgreSQL database, file storage and email, and fills in every environment variable."
+    },
+    "brand": {
+      "title": "Make it yours",
+      "description": "Set your product name, logo and colours. Add a payment provider key when you're ready to charge."
+    },
+    "build": {
+      "title": "Build your feature",
+      "description": "Copy the example projects module, rename it, and replace it with the thing your customers pay for."
+    }
+  },
+  "pricing": {
+    "title": "Simple pricing",
+    "subtitle": "Start free. Upgrade when your team grows."
+  },
+  "faq": {
+    "title": "Questions people ask before they start",
+    "items": {
+      "whatIsIncluded": {
+        "question": "What do I get on the free plan?",
+        "answer": "Up to 3 team members, 3 projects and 100 MB of file storage. No credit card required."
+      },
+      "trial": {
+        "question": "Is there a free trial of the paid plan?",
+        "answer": "Yes. The Pro plan starts with a 14-day trial, and you can cancel at any time before it ends."
+      },
+      "cancel": {
+        "question": "Can I cancel any time?",
+        "answer": "Yes. Cancel from the billing page and you keep access until the end of the paid period."
+      },
+      "dataSafety": {
+        "question": "What happens to my data if I downgrade?",
+        "answer": "Nothing is deleted. You only stop creating new items above the limits of your plan."
+      },
+      "team": {
+        "question": "Can I invite my team?",
+        "answer": "Yes. Invite people by email or share an invite link, and choose whether they join as admins or members."
+      }
+    }
+  },
+  "cta": {
+    "title": "Your product, minus the plumbing",
+    "subtitle": "Create an account and see the dashboard your customers will use.",
+    "primary": "Create a free account",
+    "secondary": "Log in"
+  },
+  "footer": {
+    "copyright": "© {{year}} {{brandName}}. All rights reserved.",
+    "pricing": "Pricing",
+    "login": "Log in",
+    "contact": "Contact"
+  },
+  "credit": {
+    "deployedOn": "Deployed on Runsite"
+  }
+}

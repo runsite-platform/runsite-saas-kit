@@ -1,0 +1,33 @@
+{
+  "title": "Overview",
+  "subtitle": "How {{organization}} is doing",
+  "loading": "Loading…",
+  "stats": {
+    "projects": "Projects",
+    "members": "Members",
+    "storage": "Storage",
+    "plan": "Plan",
+    "of_limit": "of {{limit}} on your plan",
+    "storage_of_limit": "{{used}} of {{limit}}",
+    "manage_billing": "Manage billing"
+  },
+  "plans": {
+    "free": "Free",
+    "pro": "Pro"
+  },
+  "charts": {
+    "projects_per_day": "Projects created per day",
+    "projects_series": "Projects",
+    "total_one": "{{count}} project created in this period",
+    "total_other": "{{count}} projects created in this period"
+  },
+  "range": {
+    "label": "Date range",
+    "last_days": "Last {{count}} days"
+  },
+  "upgrade": {
+    "title": "Charts are part of Pro",
+    "description": "Upgrade to see how your workspace grows day by day.",
+    "cta": "See plans"
+  }
+}

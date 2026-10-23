@@ -1,0 +1,133 @@
+{
+  "title": "Billing",
+  "subtitle": "Your plan, usage, payment method and invoices.",
+  "loading": "Loading billing details",
+  "plan_names": {
+    "free": "Free",
+    "pro": "Pro"
+  },
+  "interval": {
+    "label": "Billing interval",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "plan": {
+    "current": "Current plan",
+    "free_price": "Free",
+    "per_monthly": "/ month",
+    "per_yearly": "/ year",
+    "trial_one": "{{count}}-day free trial",
+    "trial_other": "{{count}}-day free trial",
+    "choose": "Choose plan",
+    "start_trial": "Start free trial",
+    "get_started": "Get started",
+    "unavailable": "Not available"
+  },
+  "limits": {
+    "members_one": "{{count}} member",
+    "members_other": "Up to {{count}} members",
+    "projects_one": "{{count}} project",
+    "projects_other": "Up to {{count}} projects",
+    "storage": "{{size}} MB of file storage"
+  },
+  "features": {
+    "file_uploads": "File uploads",
+    "analytics": "Analytics charts"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Start free. Upgrade when your team grows."
+  },
+  "current": {
+    "title": "Current plan",
+    "free_hint": "You are on the Free plan.",
+    "renews_on": "Renews on {{date}}.",
+    "ends_on": "Paid features end on {{date}}.",
+    "trial_ends_on": "Trial ends on {{date}}.",
+    "past_due_hint": "The last payment failed. Update your payment method in the billing portal to get paid features back.",
+    "override": "An administrator set this organization to the {{plan}} plan.",
+    "override_reason": "Reason: {{reason}}",
+    "status": {
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Payment overdue",
+      "canceled": "Canceled",
+      "expired": "Expired"
+    }
+  },
+  "actions": {
+    "manage": "Manage billing",
+    "redirecting": "Redirecting to the payment provider…"
+  },
+  "cancel": {
+    "trigger": "Cancel subscription",
+    "title": "Cancel the subscription?",
+    "description": "Paid features stay on until {{date}}. Then the organization moves to the Free plan. No data is deleted.",
+    "description_no_date": "Paid features stay on until the end of the billing period. Then the organization moves to the Free plan. No data is deleted.",
+    "confirm": "Cancel subscription",
+    "keep": "Keep subscription"
+  },
+  "usage": {
+    "title": "Usage",
+    "members": "Members and pending invitations",
+    "projects": "Projects",
+    "storage": "Storage",
+    "storage_value": "{{used}} MB of {{limit}} MB"
+  },
+  "upgrade": {
+    "title": "Upgrade",
+    "subtitle": "Pick a plan. You will finish the payment on the provider's secure page."
+  },
+  "checkout": {
+    "polling": "Confirming your payment…",
+    "succeeded_title": "Payment confirmed",
+    "succeeded": "Your organization is now on the {{plan}} plan.",
+    "processing_title": "Payment is processing",
+    "processing": "The payment provider has not confirmed the payment yet. Refresh this page in a minute to see your new plan.",
+    "canceled": "Checkout was canceled. You have not been charged."
+  },
+  "payments": {
+    "title": "Payment history",
+    "empty": "No payments yet.",
+    "date": "Date",
+    "amount": "Amount",
+    "status": "Status",
+    "invoice": "Invoice",
+    "view_invoice": "View invoice",
+    "statuses": {
+      "succeeded": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    }
+  },
+  "disabled": {
+    "title": "Billing is not enabled",
+    "description": "Everyone stays on the Free plan until you connect one payment provider. Add its environment variables to your Runsite service and redeploy.",
+    "webhook": "Webhook URL for the provider dashboard",
+    "variables": "Environment variables",
+    "providers": {
+      "stripe": "Stripe",
+      "lemonsqueezy": "Lemon Squeezy",
+      "creem": "Creem"
+    }
+  },
+  "upgrade_dialog": {
+    "title": "Upgrade to unlock this",
+    "description": "{{feature}} is part of the {{plan}} plan.",
+    "description_generic": "This feature needs a higher plan.",
+    "view_plans": "View plans",
+    "dismiss": "Not now"
+  },
+  "sidebar": {
+    "plan": "{{plan}} plan",
+    "trial": "{{plan}} trial",
+    "days_left_one": "{{count}} day left",
+    "days_left_other": "{{count}} days left",
+    "projects_used": "{{used}} of {{limit}} projects",
+    "renews": "Renews {{date}}",
+    "ends": "Ends {{date}}",
+    "past_due": "Payment failed",
+    "upgrade": "Upgrade",
+    "manage": "Manage billing"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "evt_RunsiteSubExpired001",
+  "eventType": "subscription.expired",
+  "created_at": 1795399300000,
+  "object": {
+    "id": "sub_RunsiteKit0001",
+    "object": "subscription",
+    "product": {
+      "id": "prod_pro_monthly_test",
+      "name": "Acme Pro",
+      "price": 1900,
+      "currency": "USD",
+      "billing_type": "recurring",
+      "billing_period": "every-month",
+      "status": "active",
+      "mode": "test"
+    },
+    "customer": {"id": "cust_RunsiteKit0001", "object": "customer", "email": "owner@example.com", "mode": "test"},
+    "collection_method": "charge_automatically",
+    "status": "active",
+    "last_transaction_id": "tran_RunsiteKit0001",
+    "last_transaction_date": "2026-10-23T10:00:05.000Z",
+    "current_period_start_date": "2026-10-23T10:00:00.000Z",
+    "current_period_end_date": "2026-11-23T10:00:00.000Z",
+    "canceled_at": null,
+    "created_at": "2026-10-23T10:00:04.000Z",
+    "updated_at": "2026-11-23T10:01:40.000Z",
+    "metadata": {"organization_id": "__ORGANIZATION_ID__", "plan_id": "pro", "interval": "monthly"},
+    "mode": "test"
+  }
+}

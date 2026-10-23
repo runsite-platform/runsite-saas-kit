@@ -1,0 +1,71 @@
+{
+  "title": "Notifications",
+  "subtitle": "Updates about your organizations and account.",
+  "loading": "Loading…",
+  "unread": "Unread",
+  "bell": {
+    "label": "Notifications",
+    "label_unread_one": "Notifications, {{count}} unread",
+    "label_unread_other": "Notifications, {{count}} unread",
+    "view_all": "View all notifications"
+  },
+  "filter": {
+    "label": "Show",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read"
+  },
+  "actions": {
+    "mark_read": "Mark as read",
+    "mark_unread": "Mark as unread",
+    "mark_all_read": "Mark all as read",
+    "delete": "Delete notification",
+    "clear_read": "Clear read"
+  },
+  "clear_dialog": {
+    "title": "Delete read notifications?",
+    "description": "All notifications you have already read will be deleted. Unread ones stay.",
+    "confirm": "Delete read"
+  },
+  "toast": {
+    "all_read": "All notifications marked as read",
+    "cleared": "Read notifications deleted"
+  },
+  "empty": {
+    "all": "No notifications yet",
+    "unread": "You're all caught up",
+    "read": "No read notifications",
+    "hint": "We'll let you know when something happens in your organizations."
+  },
+  "settings": {
+    "title": "Email notifications",
+    "description": "Choose which events we also send to your email. You always see them here in the app.",
+    "email_disabled": "Email sending is not configured on this server yet, so these settings take effect once it is."
+  },
+  "kinds": {
+    "welcome": {
+      "label": "Welcome",
+      "description": "A short welcome after you sign up."
+    },
+    "member_joined": {
+      "label": "New members",
+      "description": "Someone accepts an invitation to an organization you manage."
+    },
+    "member_role_changed": {
+      "label": "Role changes",
+      "description": "Your role in an organization changes."
+    },
+    "member_removed": {
+      "label": "Removed from an organization",
+      "description": "You lose access to an organization."
+    },
+    "ownership_transferred": {
+      "label": "Ownership transfers",
+      "description": "An organization is transferred to you."
+    },
+    "system": {
+      "label": "Product updates",
+      "description": "Important messages from the team behind the product."
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "loading": "Loading…",
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or was moved.",
+    "backHome": "Back to home"
+  },
+  "footer": {
+    "copyright": "© {{year}} {{brandName}}",
+    "deployedOn": "Deployed on Runsite"
+  }
+}

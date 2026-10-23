@@ -1,0 +1,42 @@
+{
+  "title": "Account",
+  "back_to_app": "Back to app",
+  "profile": {
+    "title": "Profile",
+    "description": "Your name as other members see it.",
+    "email": "Email",
+    "full_name": "Full name",
+    "save": "Save",
+    "saved": "Profile saved"
+  },
+  "password": {
+    "title": "Password",
+    "description_change": "Change the password you use to log in.",
+    "description_set": "You sign in with Google. Set a password to also log in with your email.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "save": "Update password",
+    "saved": "Password updated"
+  },
+  "linked": {
+    "title": "Linked accounts",
+    "google": "Google",
+    "linked": "Connected",
+    "not_linked": "Not connected"
+  },
+  "validation": {
+    "full_name_required": "Enter your name",
+    "full_name_max": "Name is too long",
+    "current_required": "Enter your current password",
+    "password_min": "Use at least 8 characters",
+    "password_max": "Use at most 72 characters",
+    "passwords_mismatch": "Passwords don't match"
+  },
+  "avatar": {
+    "title": "Avatar",
+    "description": "Shown next to your name across the app.",
+    "updated": "Avatar updated.",
+    "removed": "Avatar removed."
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "evt_1RunsiteCheckoutDone1",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1792713601,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {"id": null, "idempotency_key": null},
+  "type": "checkout.session.completed",
+  "data": {
+    "object": {
+      "id": "cs_test_RunsiteKit0001",
+      "object": "checkout.session",
+      "amount_subtotal": 0,
+      "amount_total": 0,
+      "cancel_url": "http://testserver/app/acme/billing?checkout=canceled",
+      "client_reference_id": "__ORGANIZATION_ID__",
+      "created": 1792713500,
+      "currency": "usd",
+      "customer": "cus_RunsiteKit0001",
+      "customer_details": {"email": "owner@example.com", "name": "Test User"},
+      "livemode": false,
+      "metadata": {"organization_id": "__ORGANIZATION_ID__", "plan_id": "pro", "interval": "monthly"},
+      "mode": "subscription",
+      "payment_status": "no_payment_required",
+      "status": "complete",
+      "subscription": "sub_1RunsiteKit0001",
+      "success_url": "http://testserver/app/acme/billing?checkout=success",
+      "url": null
+    }
+  }
+}

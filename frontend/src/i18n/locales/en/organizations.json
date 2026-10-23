@@ -1,0 +1,151 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel"
+  },
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "member": "Member"
+  },
+  "nav": {
+    "label": "Organization",
+    "overview": "Overview",
+    "projects": "Projects",
+    "files": "Files",
+    "members": "Members",
+    "billing": "Billing",
+    "settings": "Settings",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "account": "Account",
+    "logout": "Log out",
+    "accountMenu": "Account menu"
+  },
+  "switcher": {
+    "label": "Organizations",
+    "create": "Create organization"
+  },
+  "create": {
+    "title": "Create an organization",
+    "pageDescription": "Organizations hold your projects, files and team. Create one to get started.",
+    "dialogDescription": "You will be its owner. You can invite your team right after.",
+    "nameLabel": "Organization name",
+    "namePlaceholder": "Acme Inc.",
+    "submit": "Create organization",
+    "submitting": "Creating…"
+  },
+  "validation": {
+    "nameRequired": "Enter a name.",
+    "nameTooLong": "Use at most 120 characters.",
+    "slugInvalid": "Use lowercase letters, numbers and single dashes, up to 64 characters.",
+    "emailInvalid": "Enter a valid email address."
+  },
+  "overview": {
+    "title": "Welcome to {{name}}",
+    "description": "Your dashboard will show projects, members and storage here."
+  },
+  "placeholder": {
+    "description": "This section is not available yet."
+  },
+  "members": {
+    "title": "Members",
+    "seats": "{{used}} of {{limit}} seats used, pending invitations included",
+    "inviteButton": "Invite member",
+    "columns": {
+      "member": "Member",
+      "role": "Role",
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "you": "(you)",
+    "roleLabel": "Role of {{name}}",
+    "remove": "Remove",
+    "leave": "Leave",
+    "removeConfirmTitle": "Remove member?",
+    "removeConfirmDescription": "{{name}} will lose access to this organization.",
+    "leaveConfirmTitle": "Leave organization?",
+    "leaveConfirmDescription": "You will lose access to this organization until someone invites you again."
+  },
+  "invitations": {
+    "title": "Pending invitations",
+    "empty": "No pending invitations.",
+    "expires": "expires {{date}}",
+    "revoke": "Revoke",
+    "revokeConfirmTitle": "Revoke invitation?",
+    "revokeConfirmDescription": "The invitation link sent to {{email}} will stop working."
+  },
+  "invite": {
+    "title": "Invite a member",
+    "description": "We will email an invitation link. You can also copy the link and send it yourself.",
+    "emailLabel": "Email",
+    "roleLabel": "Role",
+    "submit": "Send invitation",
+    "submitting": "Sending…",
+    "createdTitle": "Invitation created",
+    "createdDescription": "We sent the link to {{email}}. Copy it now if you want to share it yourself; it is shown only once.",
+    "linkLabel": "Invitation link",
+    "linkHint": "The link works for 7 days and only for the invited email address.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "done": "Done",
+    "limitReached": "Your plan allows {{limit}} members, pending invitations included. Remove a member, revoke an invitation or upgrade the plan.",
+    "limitReachedAction": "Go to billing"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": {
+      "title": "General",
+      "description": "The name your team sees and the address used in links.",
+      "nameLabel": "Organization name",
+      "slugLabel": "Address",
+      "slugHint": "Used in links: /app/{{slug}}",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Changes saved."
+    },
+    "transfer": {
+      "title": "Transfer ownership",
+      "description": "The new owner gets full control, including billing and deleting the organization. You become an admin.",
+      "targetLabel": "New owner",
+      "targetPlaceholder": "Choose a member",
+      "noCandidates": "Invite someone first; ownership can only go to an existing member.",
+      "submit": "Transfer ownership",
+      "confirmTitle": "Transfer ownership to {{name}}?",
+      "confirmDescription": "You will become an admin and will not be able to undo this yourself."
+    },
+    "delete": {
+      "title": "Delete organization",
+      "description": "Deletes the organization with its members, invitations and data. This cannot be undone.",
+      "button": "Delete organization",
+      "confirmTitle": "Delete {{name}}?",
+      "confirmDescription": "All projects, files, members and invitations of this organization are deleted permanently.",
+      "confirmLabel": "Type {{slug}} to confirm",
+      "submit": "Delete permanently",
+      "submitting": "Deleting…"
+    }
+  },
+  "acceptInvite": {
+    "title": "Join {{organization}}",
+    "description": "You are invited to join {{organization}} as {{role}}.",
+    "descriptionWithInviter": "{{inviter}} invited you to join {{organization}} as {{role}}.",
+    "signInPrompt": "Log in or create an account with {{email}} to accept.",
+    "login": "Log in",
+    "register": "Create account",
+    "emailMismatch": "This invitation is for {{invitedEmail}}, but you are logged in as {{currentEmail}}.",
+    "switchAccount": "Log out and switch account",
+    "accept": "Accept invitation",
+    "accepting": "Joining…",
+    "invalidTitle": "Invitation not found",
+    "invalidDescription": "The link is invalid, was revoked or has already been used. Ask for a new invitation.",
+    "expiredTitle": "Invitation expired",
+    "expiredDescription": "Invitations are valid for 7 days. Ask the person who invited you to send a new one.",
+    "goHome": "Go to the home page"
+  },
+  "logo": {
+    "title": "Logo",
+    "description": "Shown in the sidebar and organization switcher.",
+    "updated": "Logo updated.",
+    "removed": "Logo removed."
+  }
+}

@@ -1,0 +1,7 @@
+Reset your password
+
+Someone asked to reset the password of your $brand_name account. Open this link to choose a new password:
+
+$link
+
+The link is valid for 1 hour. If you did not ask for a reset, ignore this email; your password stays the same.

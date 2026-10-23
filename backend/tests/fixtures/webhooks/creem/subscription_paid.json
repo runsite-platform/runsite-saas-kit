@@ -1,0 +1,48 @@
+{
+  "id": "evt_RunsiteSubPaid0001",
+  "eventType": "subscription.paid",
+  "created_at": 1792749607000,
+  "object": {
+    "id": "sub_RunsiteKit0001",
+    "object": "subscription",
+    "product": {
+      "id": "prod_pro_monthly_test",
+      "name": "Acme Pro",
+      "description": "Pro plan, billed monthly",
+      "image_url": null,
+      "price": 1900,
+      "currency": "USD",
+      "billing_type": "recurring",
+      "billing_period": "every-month",
+      "status": "active",
+      "tax_mode": "exclusive",
+      "tax_category": "saas",
+      "default_success_url": "",
+      "created_at": "2026-10-01T09:00:00.000Z",
+      "updated_at": "2026-10-01T09:00:00.000Z",
+      "mode": "test"
+    },
+    "customer": {
+      "id": "cust_RunsiteKit0001",
+      "object": "customer",
+      "email": "owner@example.com",
+      "name": "Test User",
+      "country": "UA",
+      "created_at": "2026-10-23T09:59:50.000Z",
+      "updated_at": "2026-10-23T09:59:50.000Z",
+      "mode": "test"
+    },
+    "collection_method": "charge_automatically",
+    "status": "active",
+    "last_transaction_id": "tran_RunsiteKit0001",
+    "last_transaction_date": "2026-10-23T10:00:05.000Z",
+    "next_transaction_date": "2026-11-23T10:00:00.000Z",
+    "current_period_start_date": "2026-10-23T10:00:00.000Z",
+    "current_period_end_date": "2026-11-23T10:00:00.000Z",
+    "canceled_at": null,
+    "created_at": "2026-10-23T10:00:04.000Z",
+    "updated_at": "2026-10-23T10:00:05.000Z",
+    "metadata": {"organization_id": "__ORGANIZATION_ID__", "plan_id": "pro", "interval": "monthly"},
+    "mode": "test"
+  }
+}

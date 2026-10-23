@@ -1,0 +1,50 @@
+{
+  "id": "evt_1RunsiteInvoiceFailed1",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1796515300,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {"id": null, "idempotency_key": null},
+  "type": "invoice.payment_failed",
+  "data": {
+    "object": {
+      "id": "in_1RunsiteInvoice0002",
+      "object": "invoice",
+      "account_country": "US",
+      "amount_due": 1900,
+      "amount_paid": 0,
+      "amount_remaining": 1900,
+      "attempt_count": 1,
+      "billing_reason": "subscription_cycle",
+      "collection_method": "charge_automatically",
+      "created": 1796515200,
+      "currency": "usd",
+      "customer": "cus_RunsiteKit0001",
+      "customer_email": "owner@example.com",
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_test/test_runsite_kit_failed",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_test/test_runsite_kit_failed/pdf",
+      "livemode": false,
+      "number": "RUNSITE-0003",
+      "parent": {
+        "type": "subscription_details",
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {"organization_id": "__ORGANIZATION_ID__", "plan_id": "pro", "interval": "monthly"},
+          "subscription": "sub_1RunsiteKit0001"
+        }
+      },
+      "period_end": 1796515200,
+      "period_start": 1793923200,
+      "status": "open",
+      "status_transitions": {
+        "finalized_at": 1796515200,
+        "marked_uncollectible_at": null,
+        "paid_at": null,
+        "voided_at": null
+      },
+      "subtotal": 1900,
+      "total": 1900
+    }
+  }
+}

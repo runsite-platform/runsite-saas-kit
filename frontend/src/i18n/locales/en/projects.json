@@ -1,0 +1,52 @@
+{
+  "title": "Projects",
+  "subtitle": "Everything your team is working on.",
+  "new_project": "New project",
+  "create_title": "Create project",
+  "edit_title": "Edit project",
+  "empty": "No projects yet. Create the first one.",
+  "empty_filtered": "No projects match this filter.",
+  "loading": "Loading projects…",
+  "filter": {
+    "label": "Status",
+    "all": "All",
+    "active": "Active",
+    "archived": "Archived"
+  },
+  "status": {
+    "active": "Active",
+    "archived": "Archived"
+  },
+  "fields": {
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "created_at": "Created",
+    "actions": "Actions"
+  },
+  "validation": {
+    "name_required": "Enter a project name.",
+    "name_too_long": "Use at most 200 characters.",
+    "description_too_long": "Use at most 5000 characters."
+  },
+  "actions": {
+    "edit": "Edit",
+    "archive": "Archive",
+    "restore": "Restore",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "delete_dialog": {
+    "title": "Delete this project?",
+    "description": "“{{name}}” will be deleted permanently.",
+    "confirm": "Delete project"
+  },
+  "toast": {
+    "created": "Project created.",
+    "updated": "Project saved.",
+    "archived": "Project archived.",
+    "restored": "Project restored.",
+    "deleted": "Project deleted."
+  }
+}

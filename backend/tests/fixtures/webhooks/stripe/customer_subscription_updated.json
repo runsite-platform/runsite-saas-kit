@@ -1,0 +1,60 @@
+{
+  "id": "evt_1RunsiteSubUpdated01",
+  "object": "event",
+  "api_version": "2026-09-30.endive",
+  "created": 1793923200,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {"id": null, "idempotency_key": null},
+  "type": "customer.subscription.updated",
+  "data": {
+    "object": {
+      "id": "sub_1RunsiteKit0001",
+      "object": "subscription",
+      "billing_cycle_anchor": 1793923200,
+      "cancel_at": null,
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "collection_method": "charge_automatically",
+      "created": 1792713600,
+      "currency": "usd",
+      "customer": "cus_RunsiteKit0001",
+      "ended_at": null,
+      "items": {
+        "object": "list",
+        "data": [
+          {
+            "id": "si_RunsiteKit0001",
+            "object": "subscription_item",
+            "created": 1792713600,
+            "current_period_end": 1796515200,
+            "current_period_start": 1793923200,
+            "metadata": {},
+            "price": {
+              "id": "price_pro_monthly_test",
+              "object": "price",
+              "active": true,
+              "currency": "usd",
+              "product": "prod_RunsitePro0001",
+              "recurring": {"interval": "month", "interval_count": 1, "usage_type": "licensed"},
+              "type": "recurring",
+              "unit_amount": 1900
+            },
+            "quantity": 1,
+            "subscription": "sub_1RunsiteKit0001"
+          }
+        ],
+        "has_more": false,
+        "url": "/v1/subscription_items?subscription=sub_1RunsiteKit0001"
+      },
+      "latest_invoice": "in_1RunsiteInvoice0001",
+      "livemode": false,
+      "metadata": {"organization_id": "__ORGANIZATION_ID__", "plan_id": "pro", "interval": "monthly"},
+      "start_date": 1792713600,
+      "status": "active",
+      "trial_end": 1793923200,
+      "trial_start": 1792713600
+    },
+    "previous_attributes": {"status": "trialing"}
+  }
+}

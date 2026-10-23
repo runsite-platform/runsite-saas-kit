@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Fake Stripe idempotency keys in webhook fixtures"
+regexTarget = "line"
+regexes = ['''"idempotency_key":\s*"[0-9a-f-]{36}"''']

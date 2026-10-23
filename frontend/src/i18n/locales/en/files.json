@@ -1,0 +1,37 @@
+{
+  "title": "Files",
+  "subtitle": "Files shared with your organization. Up to 25 MB each.",
+  "disabled_title": "File uploads are turned off",
+  "disabled_description": "Set the S3_* environment variables to enable file storage.",
+  "choose_file": "Choose a file",
+  "upload": "Upload",
+  "uploading": "Uploading…",
+  "empty": "No files yet.",
+  "loading": "Loading files…",
+  "fields": {
+    "name": "Name",
+    "size": "Size",
+    "uploaded_at": "Uploaded",
+    "actions": "Actions"
+  },
+  "actions": {
+    "download": "Download",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
+  "delete_dialog": {
+    "title": "Delete this file?",
+    "description": "“{{name}}” will be deleted permanently.",
+    "confirm": "Delete file"
+  },
+  "toast": {
+    "uploaded": "File uploaded.",
+    "deleted": "File deleted."
+  },
+  "image": {
+    "upload": "Upload image",
+    "replace": "Replace",
+    "remove": "Remove",
+    "hint": "PNG, JPEG or WebP, up to 2 MB."
+  }
+}
