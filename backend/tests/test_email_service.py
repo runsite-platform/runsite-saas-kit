@@ -7,6 +7,7 @@ import httpx
 import pytest
 import respx
 
+from app.config.logger import LOGGER_NAME
 from app.config.settings import Settings
 from app.emails.contents import EmailCategory, PasswordResetEmailContent, VerifyEmailContent
 from app.models.user import User
@@ -178,20 +179,17 @@ class MissingTemplateContent:
 
 
 async def test_send_logs_render_errors_and_does_not_raise(
-    email_settings: Settings, caplog: pytest.LogCaptureFixture
+    email_settings: Settings, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     sender = RecordingSender()
-    email_logger = logging.getLogger(EMAIL_LOGGER_NAME)
-    email_logger.addHandler(caplog.handler)
-    try:
-        await EmailService(sender, email_settings).send("ann@example.com", MissingTemplateContent())
-    finally:
-        email_logger.removeHandler(caplog.handler)
+    app_logger = logging.getLogger(LOGGER_NAME)
+    monkeypatch.setattr(app_logger, "propagate", False)
+    monkeypatch.setattr(app_logger, "handlers", [caplog.handler])
+
+    await EmailService(sender, email_settings).send("ann@example.com", MissingTemplateContent())
 
     assert sender.sent == []
-    [record] = {
-        id(record): record for record in caplog.records if "Failed to send email" in record.getMessage()
-    }.values()
+    [record] = [record for record in caplog.records if "Failed to send email" in record.getMessage()]
     assert "does-not-exist" in record.getMessage()
     assert "transactional" in record.getMessage()
     assert "ann@example.com" in record.getMessage()
