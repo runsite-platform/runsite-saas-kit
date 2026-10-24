@@ -162,6 +162,7 @@ without a price or product ID for the active provider is shown as not available.
 
 A new Runsite email service starts in **sandbox mode**: it only delivers to recipients you verified in the
 service, and it rewrites `From` to the shared Runsite sandbox sender (your `EMAIL_FROM` becomes `Reply-To`).
+In sandbox mode `EMAIL_REPLY_TO` may be overridden the same way.
 See [Sandbox mode](https://docs.runsite.app/services/email/sandbox/).
 
 That is why `REQUIRE_EMAIL_VERIFICATION` is `false` by default: new users are marked verified at registration and no
@@ -320,7 +321,7 @@ see users, organizations and the setup checklist.
 | Page title and favicon | `frontend/index.html`, `frontend/public/` |
 | Landing page copy | `frontend/src/i18n/locales/en/landing.json` |
 | All other UI text | `frontend/src/i18n/locales/en/` |
-| Email templates | `backend/app/emails/` |
+| Email templates | `backend/app/emails/templates/` (`layout.html` holds the header and footer of every email) |
 
 To remove the "Deployed on Runsite" link, delete `<RunsiteCredit />` from
 `frontend/src/components/landing/LandingFooter.tsx` (and the link in `frontend/src/components/layout/PublicLayout.tsx`).
