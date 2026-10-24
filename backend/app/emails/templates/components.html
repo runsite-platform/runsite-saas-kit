@@ -1,0 +1,25 @@
+{% macro heading(text) %}
+<h1 style="font-size:20px;line-height:28px;margin:0 0 16px;">{{ text }}</h1>
+{% endmacro %}
+
+{% macro paragraph(text) %}
+<p style="font-size:15px;line-height:22px;margin:0 0 24px;white-space:pre-line;">{{ text }}</p>
+{% endmacro %}
+
+{% macro button(label, url) %}
+<p style="margin:0 0 24px;">
+  <a href="{{ url }}"
+     style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px;font-size:15px;">{{ label }}</a>
+</p>
+{% endmacro %}
+
+{% macro link_fallback(url) %}
+<p data-text-skip style="font-size:13px;line-height:20px;color:#6b7280;margin:0 0 8px;">
+  Or paste this link into your browser:<br>
+  <a href="{{ url }}" style="color:#6b7280;word-break:break-all;">{{ url }}</a>
+</p>
+{% endmacro %}
+
+{% macro muted(text) %}
+<p style="font-size:13px;line-height:20px;color:#6b7280;margin:0 0 8px;">{{ text }}</p>
+{% endmacro %}

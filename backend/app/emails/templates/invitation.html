@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% import "components.html" as ui %}
+{% block preheader %}{{ inviter_name }} invited you to join {{ organization_name }}{% endblock %}
+{% block content %}
+{{ ui.heading("Join " ~ organization_name ~ " on " ~ brand_name) }}
+{{ ui.paragraph(inviter_name ~ " invited you to join " ~ organization_name ~ ".") }}
+{{ ui.button("Accept invitation", link) }}
+{{ ui.link_fallback(link) }}
+{{ ui.muted("The link is valid for 7 days. If you did not expect this invitation, you can ignore this email.") }}
+{% endblock %}

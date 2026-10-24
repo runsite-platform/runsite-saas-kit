@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% import "components.html" as ui %}
+{% block preheader %}Choose a new password for your {{ brand_name }} account{% endblock %}
+{% block content %}
+{{ ui.heading("Reset your password") }}
+{{ ui.paragraph("Someone asked to reset the password of your " ~ brand_name ~ " account. Choose a new password with the button below.") }}
+{{ ui.button("Choose a new password", link) }}
+{{ ui.link_fallback(link) }}
+{{ ui.muted("The link is valid for 1 hour. If you did not ask for a reset, ignore this email; your password stays the same.") }}
+{% endblock %}

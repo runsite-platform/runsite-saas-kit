@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% import "components.html" as ui %}
+{% block preheader %}{{ title }}{% endblock %}
+{% block content %}
+{{ ui.heading(title) }}
+{% if body %}
+{{ ui.paragraph(body) }}
+{% endif %}
+{{ ui.button("Open in " ~ brand_name, app_url ~ path) }}
+{% endblock %}
+{% block footer_extra %}
+<p style="margin:0 0 8px;">
+  You get this email about activity in your {{ brand_name }} account.
+  <a href="{{ app_url }}/notifications" style="color:#9ca3af;">Manage notifications</a>
+</p>
+{% endblock %}
