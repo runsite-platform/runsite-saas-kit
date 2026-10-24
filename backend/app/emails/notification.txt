@@ -1,9 +1,0 @@
-$title
-
-$body
-
-Open in $brand_name:
-$link
-
-You get this email because email notifications are on for this event.
-Change what we email you: $settings_link

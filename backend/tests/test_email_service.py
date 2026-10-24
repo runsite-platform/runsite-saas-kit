@@ -10,14 +10,12 @@ import respx
 from app.config.logger import LOGGER_NAME
 from app.config.settings import Settings
 from app.emails.contents import EmailCategory, PasswordResetEmailContent, VerifyEmailContent
-from app.models.user import User
 from app.services.email_service import (
     EMAIL_LOGGER_NAME,
     EmailMessage,
     EmailService,
     LoggingEmailSender,
     RunsiteEmailSender,
-    render_email_template,
 )
 from tests.conftest import make_settings
 
@@ -35,10 +33,6 @@ class RecordingSender:
 @pytest.fixture
 def email_settings() -> Settings:
     return make_settings(EMAIL_API_KEY="re_test_key", EMAIL_FROM="Acme <noreply@acme.test>", BRAND_NAME="Acme")
-
-
-def build_user() -> User:
-    return User(email="ann@example.com", full_name="Ann")
 
 
 async def test_runsite_sender_posts_expected_request(email_settings: Settings) -> None:
@@ -79,7 +73,7 @@ async def test_email_service_swallows_sandbox_400_and_logs(
         email_logger = logging.getLogger(EMAIL_LOGGER_NAME)
         email_logger.addHandler(caplog.handler)
         try:
-            await service.send_verification_email(build_user(), "token-123")
+            await service.send("ann@example.com", VerifyEmailContent(link="http://testserver/verify-email?token=t"))
         finally:
             email_logger.removeHandler(caplog.handler)
 
@@ -87,33 +81,9 @@ async def test_email_service_swallows_sandbox_400_and_logs(
     assert any("Failed to send email" in record.getMessage() for record in caplog.records)
 
 
-async def test_verification_email_contains_link(email_settings: Settings) -> None:
-    sender = RecordingSender()
-    await EmailService(sender, email_settings).send_verification_email(build_user(), "token-123")
-    [message] = sender.sent
-    assert message.to == "ann@example.com"
-    assert "Acme" in message.subject
-    assert "http://testserver/verify-email?token=token-123" in message.text
-    assert "http://testserver/verify-email?token=token-123" in message.html
-
-
-async def test_password_reset_email_contains_link(email_settings: Settings) -> None:
-    sender = RecordingSender()
-    await EmailService(sender, email_settings).send_password_reset_email(build_user(), "reset-456")
-    [message] = sender.sent
-    assert "http://testserver/reset-password?token=reset-456" in message.text
-
-
 async def test_logging_sender_does_not_raise(email_settings: Settings) -> None:
     message = EmailMessage(to="ann@example.com", subject="Hello", html="<p>Hi</p>", text="Hi")
     await LoggingEmailSender(email_settings).send(message)
-
-
-def test_render_escapes_html_values() -> None:
-    html, text = render_email_template("verify", brand_name="<Acme>", link="http://x.test/?a=1&b=2")
-    assert "&lt;Acme&gt;" in html
-    assert "<Acme>" in text
-    assert "http://x.test/?a=1&amp;b=2" in html
 
 
 async def test_runsite_sender_adds_reply_to_and_headers_when_set(email_settings: Settings) -> None:

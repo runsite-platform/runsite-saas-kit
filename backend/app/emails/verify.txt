@@ -1,7 +1,0 @@
-Confirm your email
-
-Thanks for signing up for $brand_name. Open this link to confirm your email address:
-
-$link
-
-The link is valid for 24 hours. If you did not create an account, ignore this email.
