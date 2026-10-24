@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.db import get_db_session
 from app.config.settings import Settings, get_settings
-from app.models.enums import OrgRole, PlatformRole
+from app.constants.enums import OrgRole, PlatformRole
 from app.models.membership import Membership
 from app.models.user import User
 from app.repositories.membership_repository import MembershipRepository

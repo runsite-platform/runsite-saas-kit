@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from app.models import Payment
-from app.models.enums import OrgRole, PaymentStatus, PlatformRole
+from app.constants.enums import OrgRole, PaymentStatus, PlatformRole
 from tests.factories import add_member, auth_headers, create_organization, create_subscription, create_user
 
 

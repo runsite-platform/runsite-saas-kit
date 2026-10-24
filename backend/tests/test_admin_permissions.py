@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from tests.factories import auth_headers, create_organization, create_user
 
 STAFF_ROLES = frozenset({PlatformRole.ADMIN, PlatformRole.SUPERADMIN})

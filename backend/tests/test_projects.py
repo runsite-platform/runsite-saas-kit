@@ -2,7 +2,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 from tests.factories import add_member, auth_headers, create_organization, create_project, create_user
 
 

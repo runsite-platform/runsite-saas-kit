@@ -1,6 +1,6 @@
 from jose import jwt
 
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from tests.factories import auth_headers, create_user
 
 

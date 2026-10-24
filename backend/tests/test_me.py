@@ -2,7 +2,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from app.utils.security import verify_password
 from tests.auth_helpers import login_user
 from tests.factories import auth_headers, create_user

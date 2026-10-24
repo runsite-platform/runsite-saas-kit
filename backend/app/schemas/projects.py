@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 
 
 class ProjectCreate(BaseModel):

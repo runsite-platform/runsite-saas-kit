@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi_pagination import Page
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import NotificationKind
+from app.constants.enums import NotificationKind
 
 
 class NotificationResponse(BaseModel):

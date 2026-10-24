@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.db import DatabaseManager
 from app.config.settings import Settings, get_settings
 from app.models import Membership, Organization, Project, User
-from app.models.enums import OrgRole, PlatformRole, ProjectStatus
+from app.constants.enums import OrgRole, PlatformRole, ProjectStatus
 from app.repositories.admin_query_repository import AdminQueryRepository
 from app.services.signup_service import SignupService
 from app.services.superadmin_service import SuperadminService

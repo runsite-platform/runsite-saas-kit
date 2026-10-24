@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi_pagination import Page
 
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 from app.models.project import Project
 from app.utils.repository import SQLAlchemyRepository
 

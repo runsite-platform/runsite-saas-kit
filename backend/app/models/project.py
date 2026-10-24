@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.config.db import Base
 from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 
 
 class Project(UUIDPrimaryKeyMixin, TimestampMixin, Base):

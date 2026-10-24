@@ -1,4 +1,4 @@
-from app.models.enums import SubscriptionStatus
+from app.constants.enums import SubscriptionStatus
 from app.services.billing.billing_service import BillingService
 from tests.factories import auth_headers, create_organization, create_project, create_subscription, create_user
 

@@ -1,6 +1,6 @@
 import pytest
 
-from app.models.enums import BillingInterval
+from app.constants.enums import BillingInterval
 from app.services.billing.plans import PLANS
 from app.services.billing.provider_config import ProviderConfig, is_paid_plan
 from tests.conftest import make_settings

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 from app.models.stored_file import StoredFile
 from tests.factories import create_organization, create_project, create_stored_file, create_user
 

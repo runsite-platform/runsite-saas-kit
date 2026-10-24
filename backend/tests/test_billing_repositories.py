@@ -1,4 +1,4 @@
-from app.models.enums import OrgRole, SubscriptionStatus
+from app.constants.enums import OrgRole, SubscriptionStatus
 from app.repositories.billing_event_repository import BillingEventRepository
 from app.repositories.payment_repository import PaymentRepository
 from app.repositories.subscription_repository import SubscriptionRepository

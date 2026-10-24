@@ -1,6 +1,6 @@
 import pytest
 
-from app.models.enums import SubscriptionStatus
+from app.constants.enums import SubscriptionStatus
 from tests.factories import auth_headers, create_organization, create_subscription, create_user
 
 

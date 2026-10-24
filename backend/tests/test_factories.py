@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from app.utils.security import decode_access_token, verify_password
 from tests.conftest import make_settings
 from tests.factories import auth_headers, create_user

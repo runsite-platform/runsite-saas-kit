@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import AuthTokenKind
+from app.constants.enums import AuthTokenKind
 from app.models.oauth_account import GOOGLE_PROVIDER, OAuthAccount
 from app.models.user import User
 from app.repositories.auth_token import AuthTokenRepository

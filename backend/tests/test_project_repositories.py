@@ -1,7 +1,7 @@
 from fastapi_pagination import Params, set_params
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.stored_file_repository import StoredFileRepository
 from tests.factories import create_organization, create_project, create_stored_file, create_user

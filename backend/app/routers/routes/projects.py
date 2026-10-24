@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter
 from fastapi_pagination import Page
 
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 from app.schemas.projects import ProjectCreate, ProjectResponse, ProjectUpdate
 from app.services.project_service import ProjectService
 from app.utils.dependencies import CurrentMembership, DbSession

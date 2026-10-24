@@ -4,7 +4,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.repositories.membership_repository import MembershipRepository
 from tests.factories import add_member, auth_headers, create_invitation, create_organization, create_user
 

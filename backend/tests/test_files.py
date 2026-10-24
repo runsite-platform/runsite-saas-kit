@@ -7,7 +7,7 @@ from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.models.organization import Organization
 from app.models.stored_file import StoredFile
 from app.services import file_service

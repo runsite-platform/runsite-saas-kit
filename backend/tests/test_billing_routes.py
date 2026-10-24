@@ -6,7 +6,7 @@ import stripe
 
 from app.config.settings import Settings
 from app.models import Payment
-from app.models.enums import OrgRole, PaymentStatus, SubscriptionStatus
+from app.constants.enums import OrgRole, PaymentStatus, SubscriptionStatus
 from app.services.billing.billing_service import BillingService
 from app.services.billing.providers.stripe_provider import StripeProvider
 from app.utils.dependencies import get_payment_provider

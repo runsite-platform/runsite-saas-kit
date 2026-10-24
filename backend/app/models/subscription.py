@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.config.db import Base
 from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.enums import SubscriptionStatus
+from app.constants.enums import SubscriptionStatus
 
 PLAN_GRANTING_STATUSES: tuple[SubscriptionStatus, ...] = (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE)
 BLOCKING_STATUSES: tuple[SubscriptionStatus, ...] = (

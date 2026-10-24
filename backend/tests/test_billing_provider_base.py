@@ -7,7 +7,7 @@ import httpx
 import pytest
 import respx
 
-from app.models.enums import BillingInterval
+from app.constants.enums import BillingInterval
 from app.services.billing.providers.base import (
     BillingProviderError,
     WebhookPayloadError,

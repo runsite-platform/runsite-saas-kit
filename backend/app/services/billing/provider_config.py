@@ -1,5 +1,5 @@
 from app.config.settings import Settings
-from app.models.enums import BillingInterval
+from app.constants.enums import BillingInterval
 from app.services.billing.plans import PLANS, Plan
 
 PRICE_REFERENCE_SETTINGS: dict[str, dict[tuple[str, BillingInterval], str]] = {

@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import ProjectStatus
+from app.constants.enums import ProjectStatus
 from app.models.membership import Membership
 from app.models.project import Project
 from app.repositories.project_repository import ProjectRepository

@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import BillingInterval, OrgRole, PlatformRole, ProjectStatus, SubscriptionStatus
+from app.constants.enums import BillingInterval, OrgRole, PlatformRole, ProjectStatus, SubscriptionStatus
 from app.models.invitation import Invitation
 from app.models.membership import Membership
 from app.models.organization import Organization

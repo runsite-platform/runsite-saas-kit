@@ -8,7 +8,7 @@ from typing import Any, Literal, Protocol
 from uuid import UUID
 
 from app.models import Organization, Subscription
-from app.models.enums import BillingInterval, PaymentStatus, SubscriptionStatus
+from app.constants.enums import BillingInterval, PaymentStatus, SubscriptionStatus
 from app.services.billing.plans import Plan
 
 EventKind = Literal[

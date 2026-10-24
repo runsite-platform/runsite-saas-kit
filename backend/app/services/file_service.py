@@ -5,7 +5,7 @@ from fastapi import UploadFile
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.models.membership import Membership
 from app.models.stored_file import StoredFile
 from app.repositories.stored_file_repository import StoredFileRepository

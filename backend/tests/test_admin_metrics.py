@@ -1,7 +1,7 @@
 from datetime import UTC, date, datetime, timedelta
 
 from app.models import Subscription, User
-from app.models.enums import BillingInterval, PlatformRole, SubscriptionStatus
+from app.constants.enums import BillingInterval, PlatformRole, SubscriptionStatus
 from app.schemas.admin import TrialConversion
 from app.schemas.overview import ChartRange, DailyCount
 from app.services.admin_metrics_service import AdminMetricsService, calculate_mrr_cents, conversion_rate

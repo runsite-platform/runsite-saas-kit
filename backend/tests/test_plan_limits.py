@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.services.plan_limits import PlanLimitsService
 from app.utils.exceptions import BusinessError
 from tests.factories import add_member, create_invitation, create_organization, create_user

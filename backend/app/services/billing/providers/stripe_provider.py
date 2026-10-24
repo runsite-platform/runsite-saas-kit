@@ -5,7 +5,7 @@ import stripe
 
 from app.config.settings import Settings
 from app.models import Organization, Subscription
-from app.models.enums import BillingInterval, PaymentStatus, SubscriptionStatus
+from app.constants.enums import BillingInterval, PaymentStatus, SubscriptionStatus
 from app.services.billing.plans import Plan
 from app.services.billing.provider_config import ProviderConfig
 from app.services.billing.providers.base import (

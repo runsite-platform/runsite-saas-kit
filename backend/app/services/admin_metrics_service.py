@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import BillingInterval, SubscriptionStatus
+from app.constants.enums import BillingInterval, SubscriptionStatus
 from app.repositories.admin_query_repository import AdminQueryRepository
 from app.schemas.admin import PlatformMetricsResponse, TrialConversion
 from app.schemas.overview import ChartRange

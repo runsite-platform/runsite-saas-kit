@@ -2,7 +2,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.repositories.organization_repository import OrganizationRepository
 from app.services.signup_service import SignupService
 from tests.factories import add_member, auth_headers, create_organization, create_user

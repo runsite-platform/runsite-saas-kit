@@ -8,7 +8,7 @@ import pytest
 import respx
 
 from app.config.settings import Settings
-from app.models.enums import BillingInterval, PaymentStatus, SubscriptionStatus
+from app.constants.enums import BillingInterval, PaymentStatus, SubscriptionStatus
 from app.services.billing.plans import PLANS
 from app.services.billing.providers.base import (
     BillingProviderError,

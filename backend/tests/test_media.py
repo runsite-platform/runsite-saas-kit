@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.services.media_service import MAX_IMAGE_BYTES
 from tests.factories import add_member, auth_headers, create_organization, create_user
 from tests.fakes import InMemoryObjectStorage

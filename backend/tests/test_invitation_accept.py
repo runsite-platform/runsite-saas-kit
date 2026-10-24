@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.models.invitation import Invitation
 from app.models.membership import Membership
 from tests.factories import add_member, auth_headers, create_invitation, create_organization, create_user

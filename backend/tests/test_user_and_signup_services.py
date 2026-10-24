@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from app.models.oauth_account import GOOGLE_PROVIDER, OAuthAccount
 from app.repositories.oauth_account import OAuthAccountRepository
 from app.schemas.users import UserResponse

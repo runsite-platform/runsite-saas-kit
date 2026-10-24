@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models.enums import NotificationKind, PlatformRole
+from app.constants.enums import NotificationKind, PlatformRole
 from app.models.user import User
 from app.services.notification_service import NotificationService
 from app.services.organization_service import OrganizationService

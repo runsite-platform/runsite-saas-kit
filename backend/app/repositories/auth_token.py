@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from app.models.auth_token import AuthToken
-from app.models.enums import AuthTokenKind
+from app.constants.enums import AuthTokenKind
 from app.utils.repository import SQLAlchemyRepository
 
 

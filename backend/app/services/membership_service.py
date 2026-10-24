@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import NotificationKind, OrgRole
+from app.constants.enums import NotificationKind, OrgRole
 from app.models.membership import Membership
 from app.models.user import User
 from app.repositories.membership_repository import MembershipRepository

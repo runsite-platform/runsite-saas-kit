@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import NotificationKind
+from app.constants.enums import NotificationKind
 from app.models.notification import Notification
 from app.models.user import User
 from app.repositories.notification_repository import (

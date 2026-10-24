@@ -1,4 +1,4 @@
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from app.services.setup_checklist_service import SetupChecklistService
 from tests.conftest import make_settings
 from tests.factories import auth_headers, create_user

@@ -3,7 +3,7 @@ from datetime import timedelta
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.enums import AuthTokenKind
+from app.constants.enums import AuthTokenKind
 from app.repositories.auth_token import AuthTokenRepository
 from app.repositories.user import UserRepository
 from app.utils.security import hash_token, utc_now

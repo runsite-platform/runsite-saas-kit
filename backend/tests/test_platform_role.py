@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 
-from app.models.enums import PlatformRole
+from app.constants.enums import PlatformRole
 from app.utils.dependencies import require_platform_role
 from app.utils.exceptions import BusinessError
 from app.utils.security import AccessTokenClaims

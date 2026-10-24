@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.db import get_db_session
 from app.config.settings import Settings, get_settings
-from app.models.enums import OrgRole
+from app.constants.enums import OrgRole
 from app.models.membership import Membership
 from app.utils.dependencies import CurrentMembership, require_feature, require_org_role
 from app.utils.exceptions import BusinessError, business_error_handler
