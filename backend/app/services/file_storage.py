@@ -18,21 +18,31 @@ ACCESS_DENIED_CODE = "AccessDenied"
 
 
 class ObjectStorage(Protocol):
-    async def put(self, key: str, data: bytes, content_type: str) -> None: ...
+    """Protocol for object storage backends."""
 
-    async def delete(self, key: str) -> bool: ...  # False when the key may not delete (AccessDenied); logs a warning
+    async def put(self, key: str, data: bytes, content_type: str) -> None:
+        """Upload data under the given key."""
+        ...
+
+    async def delete(self, key: str) -> bool:
+        """Delete the object under the given key."""
+        ...  # False when the key may not delete (AccessDenied); logs a warning
 
     def presigned_get_url(
         self, key: str, expires_seconds: int = MAX_PRESIGNED_SECONDS, download_name: str | None = None
-    ) -> str: ...
+    ) -> str:
+        """Return a temporary download URL for the key."""
+        ...
 
 
 def attachment_disposition(file_name: str) -> str:
+    """Return a Content-Disposition attachment header for the file name."""
     ascii_fallback = file_name.encode("ascii", "ignore").decode().replace('"', "").replace("\\", "") or "download"
     return f"attachment; filename=\"{ascii_fallback}\"; filename*=UTF-8''{quote(file_name, safe='')}"
 
 
 def build_s3_client(*, access_key_id: str, secret_access_key: str, endpoint_url: str, region: str) -> Any:
+    """Create a boto3 S3 client for an S3-compatible endpoint."""
     config = Config(
         signature_version="s3v4",
         s3={"addressing_style": "path"},
@@ -50,17 +60,21 @@ def build_s3_client(*, access_key_id: str, secret_access_key: str, endpoint_url:
 
 
 class S3ObjectStorage:
+    """Object storage backed by an S3-compatible bucket."""
+
     def __init__(self, *, bucket: str, client: Any, delete_client: Any | None) -> None:
         self.bucket = bucket
         self.client = client
         self.delete_client = delete_client
 
     async def put(self, key: str, data: bytes, content_type: str) -> None:
+        """Upload data to the bucket under the given key."""
         await asyncio.to_thread(
             self.client.put_object, Bucket=self.bucket, Key=key, Body=data, ContentType=content_type
         )
 
     async def delete(self, key: str) -> bool:
+        """Delete the object, returning False when access is denied."""
         client = self.delete_client if self.delete_client is not None else self.client
         try:
             await asyncio.to_thread(client.delete_object, Bucket=self.bucket, Key=key)
@@ -78,6 +92,7 @@ class S3ObjectStorage:
     def presigned_get_url(
         self, key: str, expires_seconds: int = MAX_PRESIGNED_SECONDS, download_name: str | None = None
     ) -> str:
+        """Return a presigned GET URL capped at the maximum lifetime."""
         params: dict[str, str] = {"Bucket": self.bucket, "Key": key}
         if download_name is not None:
             params["ResponseContentDisposition"] = attachment_disposition(download_name)
@@ -113,6 +128,7 @@ def _cached_object_storage(
 
 
 def build_object_storage(settings: Settings) -> S3ObjectStorage | None:
+    """Return the configured S3 storage, or None when disabled."""
     if not settings.storage_enabled:
         return None
     delete_enabled = settings.storage_delete_enabled
@@ -128,18 +144,21 @@ def build_object_storage(settings: Settings) -> S3ObjectStorage | None:
 
 
 def require_storage(storage: ObjectStorage | None) -> ObjectStorage:
+    """Return the storage or raise if it is not configured."""
     if storage is None:
         raise BusinessError("storage_disabled", "File storage is not configured", 400)
     return storage
 
 
 def presigned_url_or_none(storage: ObjectStorage | None, key: str | None) -> str | None:
+    """Return a presigned URL for the key, or None if unavailable."""
     if storage is None or not key:
         return None
     return storage.presigned_get_url(key)
 
 
 async def delete_object_best_effort(storage: ObjectStorage, key: str) -> bool:
+    """Delete the object, logging and returning False on failure."""
     try:
         return await storage.delete(key)
     except Exception:

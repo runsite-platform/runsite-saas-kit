@@ -17,6 +17,7 @@ MONTHS_PER_YEAR = 12
 
 
 def calculate_mrr_cents(active_subscription_counts: Iterable[tuple[str, str, int]]) -> int:
+    """Return monthly recurring revenue in cents for active subscription counts."""
     monthly_cents = 0
     yearly_cents = 0
     for plan_id, interval, subscription_count in active_subscription_counts:
@@ -29,17 +30,21 @@ def calculate_mrr_cents(active_subscription_counts: Iterable[tuple[str, str, int
 
 
 def conversion_rate(converted: int, ended_trials: int) -> float | None:
+    """Return the trial conversion rate, or None when no trials ended."""
     if ended_trials == 0:
         return None
     return round(converted / ended_trials, 4)
 
 
 class AdminMetricsService:
-    def __init__(self, session: AsyncSession, clock: Clock = utc_now) -> None:
-        self.queries = AdminQueryRepository(session)
+    """Service for platform-wide admin metrics."""
+
+    def __init__(self, db: AsyncSession, clock: Clock = utc_now) -> None:
+        self.queries = AdminQueryRepository(db)
         self.clock = clock
 
     async def get_metrics(self, days: ChartRange) -> PlatformMetricsResponse:
+        """Return platform revenue, subscription and growth metrics."""
         now = self.clock()
         series_length = int(days)
         status_counts = await self.queries.count_subscriptions_by_status()

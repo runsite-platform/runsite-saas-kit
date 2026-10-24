@@ -5,6 +5,8 @@ FREE_PLAN_ID = "free"
 
 @dataclass(frozen=True)
 class Limits:
+    """Resource limits of a plan."""
+
     members: int
     projects: int
     storage_mb: int
@@ -12,6 +14,8 @@ class Limits:
 
 @dataclass(frozen=True)
 class Plan:
+    """Subscription plan with pricing, limits and features."""
+
     id: str
     name: str
     price_monthly_cents: int
@@ -46,4 +50,5 @@ FEATURE_REQUIRED_PLAN: dict[str, str] = {"file_uploads": "free", "analytics": "p
 
 
 def get_plan(plan_id: str) -> Plan:
+    """Return the plan by id, falling back to the free plan."""
     return PLANS.get(plan_id, PLANS[FREE_PLAN_ID])

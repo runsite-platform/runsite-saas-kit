@@ -24,6 +24,8 @@ DOCS_URLS = {
 
 @dataclass(frozen=True)
 class ProviderSettingNames:
+    """Setting names required by a billing provider."""
+
     credentials: tuple[str, ...]
     price_ids: tuple[str, ...]
     webhook_secret: str
@@ -49,10 +51,12 @@ PROVIDER_SETTING_NAMES = {
 
 
 def ok_or(condition: bool, otherwise: ChecklistStatus = ChecklistStatus.MISSING) -> ChecklistStatus:
+    """Return OK when the condition holds, otherwise the given status."""
     return ChecklistStatus.OK if condition else otherwise
 
 
 def presence_status(settings: Settings, setting_names: tuple[str, ...]) -> ChecklistStatus:
+    """Return OK, WARNING or MISSING based on which settings are set."""
     configured_count = sum(1 for setting_name in setting_names if getattr(settings, setting_name))
     if configured_count == len(setting_names):
         return ChecklistStatus.OK
@@ -62,11 +66,14 @@ def presence_status(settings: Settings, setting_names: tuple[str, ...]) -> Check
 
 
 class SetupChecklistService:
-    def __init__(self, session: AsyncSession, settings: Settings) -> None:
-        self.queries = AdminQueryRepository(session)
+    """Service for the admin setup checklist."""
+
+    def __init__(self, db: AsyncSession, settings: Settings) -> None:
+        self.queries = AdminQueryRepository(db)
         self.settings = settings
 
     async def get_checklist(self) -> SetupChecklistResponse:
+        """Return the status of every setup checklist item."""
         settings = self.settings
         provider_settings = PROVIDER_SETTING_NAMES.get(settings.BILLING_PROVIDER) if settings.billing_enabled else None
         statuses = {

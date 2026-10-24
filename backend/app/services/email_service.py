@@ -24,6 +24,8 @@ EMAIL_TIMEOUT_SECONDS = 60.0
 
 @dataclass(frozen=True)
 class EmailMessage:
+    """Rendered email ready to be sent."""
+
     to: str
     subject: str
     html: str
@@ -31,7 +33,11 @@ class EmailMessage:
 
 
 class EmailSender(Protocol):
-    async def send(self, message: EmailMessage) -> None: ...
+    """Protocol for email delivery backends."""
+
+    async def send(self, message: EmailMessage) -> None:
+        """Send the email message."""
+        ...
 
 
 @lru_cache
@@ -40,6 +46,7 @@ def _load_template(file_name: str) -> Template:
 
 
 def render_email_template(name: str, **values: str) -> tuple[str, str]:
+    """Render the HTML and text bodies of a named email template."""
     escaped_values = {key: html.escape(value, quote=True) for key, value in values.items()}
     html_body = _load_template(f"{name}.html").substitute(escaped_values)
     text_body = _load_template(f"{name}.txt").substitute(values)
@@ -54,6 +61,7 @@ class RunsiteEmailSender:
         self.timeout_seconds = timeout_seconds
 
     async def send(self, message: EmailMessage) -> None:
+        """Post the email to the Runsite email API."""
         payload = {
             "from": self.settings.EMAIL_FROM,
             "to": [message.to],
@@ -69,21 +77,27 @@ class RunsiteEmailSender:
 
 
 class LoggingEmailSender:
+    """Email sender that logs messages instead of sending them."""
+
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
 
     async def send(self, message: EmailMessage) -> None:
+        """Log the email instead of sending it."""
         logger.info("Email not sent (EMAIL_API_KEY is not set): %r to %s", message.subject, message.to)
         if self.settings.DEBUG:
             logger.info("Email text for %s:\n%s", message.to, message.text)
 
 
 class EmailService:
+    """Service for sending transactional emails from templates."""
+
     def __init__(self, sender: EmailSender, settings: Settings) -> None:
         self.sender = sender
         self.settings = settings
 
     async def send_verification_email(self, user: User, token: str) -> None:
+        """Send the email address verification link."""
         await self._send_template(
             "verify",
             to=user.email,
@@ -92,6 +106,7 @@ class EmailService:
         )
 
     async def send_password_reset_email(self, user: User, token: str) -> None:
+        """Send the password reset link."""
         await self._send_template(
             "reset",
             to=user.email,
@@ -100,6 +115,7 @@ class EmailService:
         )
 
     async def send_invitation_email(self, *, email: str, organization_name: str, inviter_name: str, token: str) -> None:
+        """Send an organization invitation link."""
         await self._send_template(
             "invitation",
             to=email,
@@ -110,6 +126,7 @@ class EmailService:
         )
 
     async def send_notification_email(self, email: "NotificationEmail") -> None:
+        """Send a notification email."""
         await self._send_template(
             "notification",
             to=email.to,

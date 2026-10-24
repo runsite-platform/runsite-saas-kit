@@ -21,15 +21,16 @@ from app.utils.dependencies import (
     VerifiedUser,
 )
 
-organization_invitations_router = APIRouter(prefix="/orgs/{org_id}/invitations", tags=["invitations"])
-public_invitations_router = APIRouter(prefix="/invitations", tags=["invitations"])
+organization_invitations_router = APIRouter()
+public_invitations_router = APIRouter()
 
 
 @organization_invitations_router.get("")
 async def list_invitations(
-    membership: OrgManagerMembership, session: DbSession, settings: AppSettings
+    membership: OrgManagerMembership, db: DbSession, settings: AppSettings
 ) -> list[InvitationResponse]:
-    return await InvitationService(session, settings).list_pending(membership.organization_id)
+    """List pending invitations of the organization."""
+    return await InvitationService(db, settings).list_pending(membership.organization_id)
 
 
 @organization_invitations_router.post("", status_code=status.HTTP_201_CREATED)
@@ -38,11 +39,12 @@ async def create_invitation(
     background_tasks: BackgroundTasks,
     membership: OrgManagerMembership,
     inviter: VerifiedUser,
-    session: DbSession,
+    db: DbSession,
     settings: AppSettings,
     email_service: EmailServiceDep,
 ) -> InvitationCreatedResponse:
-    created_invitation = await InvitationService(session, settings).create_invitation(membership, inviter, data)
+    """Invite a user to the organization by email."""
+    created_invitation = await InvitationService(db, settings).create_invitation(membership, inviter, data)
     background_tasks.add_task(
         email_service.send_invitation_email,
         email=created_invitation.invitation.email,
@@ -58,22 +60,25 @@ async def create_invitation(
 
 @organization_invitations_router.delete("/{invitation_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def revoke_invitation(
-    invitation_id: UUID, membership: OrgManagerMembership, session: DbSession, settings: AppSettings
+    invitation_id: UUID, membership: OrgManagerMembership, db: DbSession, settings: AppSettings
 ) -> None:
-    await InvitationService(session, settings).revoke_invitation(membership.organization_id, invitation_id)
+    """Revoke a pending invitation."""
+    await InvitationService(db, settings).revoke_invitation(membership.organization_id, invitation_id)
 
 
 @public_invitations_router.get("/{token}")
-async def get_invitation_preview(token: str, session: DbSession, settings: AppSettings) -> InvitationPreviewResponse:
-    return await InvitationService(session, settings).get_preview(token)
+async def get_invitation_preview(token: str, db: DbSession, settings: AppSettings) -> InvitationPreviewResponse:
+    """Return public invitation details by token."""
+    return await InvitationService(db, settings).get_preview(token)
 
 
 @public_invitations_router.post("/{token}/accept")
 async def accept_invitation(
     token: str,
     user: CurrentUser,
-    session: DbSession,
+    db: DbSession,
     settings: AppSettings,
     notification_emails: NotificationEmailQueueDep,
 ) -> OrganizationSummary:
-    return await InvitationService(session, settings, notification_emails).accept_invitation(user, token)
+    """Accept an invitation for the current user."""
+    return await InvitationService(db, settings, notification_emails).accept_invitation(user, token)

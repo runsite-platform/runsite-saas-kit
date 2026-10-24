@@ -53,6 +53,8 @@ INVOICE_EVENT_STATUSES: dict[str, PaymentStatus] = {
 
 
 class StripeProvider:
+    """Stripe payment provider."""
+
     name = "stripe"
 
     def __init__(self, settings: Settings, client: Any | None = None) -> None:
@@ -74,6 +76,7 @@ class StripeProvider:
         success_url: str,
         cancel_url: str,
     ) -> str:
+        """Create a Stripe Checkout session and return its URL."""
         price_id = self.provider_config.price_reference(plan.id, interval)
         if price_id is None:
             raise BillingProviderError(f"No Stripe price configured for {plan.id} ({interval})")
@@ -103,6 +106,7 @@ class StripeProvider:
         return str(checkout_session.url)
 
     async def create_portal_url(self, organization: Organization, return_url: str) -> str:
+        """Create a Stripe billing portal session and return its URL."""
         params = {"customer": organization.billing_customer_id, "return_url": return_url}
         try:
             portal_session = await self._get_client().v1.billing_portal.sessions.create_async(params=params)
@@ -111,6 +115,7 @@ class StripeProvider:
         return str(portal_session.url)
 
     async def cancel_subscription(self, subscription: Subscription, at_period_end: bool = True) -> None:
+        """Cancel the Stripe subscription immediately or at period end."""
         try:
             subscriptions = self._get_client().v1.subscriptions
             if at_period_end:
@@ -123,6 +128,7 @@ class StripeProvider:
             raise BillingProviderError(f"Stripe cancellation failed: {error}") from error
 
     def parse_webhook(self, raw_body: bytes, headers: Mapping[str, str]) -> NormalizedEvent:
+        """Verify a Stripe webhook signature and normalize the event."""
         signature = header_value(headers, STRIPE_SIGNATURE_HEADER)
         if not signature or not self.settings.STRIPE_WEBHOOK_SECRET:
             raise WebhookSignatureError("Missing Stripe signature or webhook secret")
@@ -136,6 +142,7 @@ class StripeProvider:
 
 
 def normalize_stripe_event(payload: dict[str, Any]) -> NormalizedEvent:
+    """Convert a Stripe event payload into a NormalizedEvent."""
     try:
         return _normalize(payload)
     except (KeyError, TypeError, ValueError, IndexError) as error:

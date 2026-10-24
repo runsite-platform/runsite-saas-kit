@@ -11,7 +11,7 @@ from app.services.billing.providers.base import PaymentProvider
 from app.utils.dependencies import AppSettings, DbSession, PlatformStaffUser, get_payment_provider
 from app.utils.pagination import SearchQuery
 
-router = APIRouter(prefix="/admin/organizations", tags=["admin"])
+router = APIRouter()
 
 PlanFilterQuery = Annotated[str | None, Query(max_length=32)]
 
@@ -19,19 +19,21 @@ PlanFilterQuery = Annotated[str | None, Query(max_length=32)]
 @router.get("")
 async def list_organizations(
     _: PlatformStaffUser,
-    session: DbSession,
+    db: DbSession,
     settings: AppSettings,
     search: SearchQuery = None,
     plan_id: PlanFilterQuery = None,
 ) -> Page[AdminOrganizationSummary]:
-    return await AdminService(session, settings).list_organizations(search=search, plan_id=plan_id)
+    """List organizations for platform staff."""
+    return await AdminService(db, settings).list_organizations(search=search, plan_id=plan_id)
 
 
 @router.get("/{organization_id}")
 async def get_organization(
-    organization_id: UUID, _: PlatformStaffUser, session: DbSession, settings: AppSettings
+    organization_id: UUID, _: PlatformStaffUser, db: DbSession, settings: AppSettings
 ) -> AdminOrganizationDetail:
-    return await AdminService(session, settings).get_organization_detail(organization_id)
+    """Return organization details for platform staff."""
+    return await AdminService(db, settings).get_organization_detail(organization_id)
 
 
 @router.post("/{organization_id}/plan-override")
@@ -39,9 +41,10 @@ async def override_plan(
     organization_id: UUID,
     request: PlanOverrideRequest,
     actor: PlatformStaffUser,
-    session: DbSession,
+    db: DbSession,
     settings: AppSettings,
     provider: Annotated[PaymentProvider | None, Depends(get_payment_provider)],
 ) -> AdminOrganizationDetail:
-    billing_service = BillingService(session, settings, provider)
-    return await AdminService(session, settings).override_plan(actor, organization_id, request, billing_service)
+    """Override the organization billing plan."""
+    billing_service = BillingService(db, settings, provider)
+    return await AdminService(db, settings).override_plan(actor, organization_id, request, billing_service)

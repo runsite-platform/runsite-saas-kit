@@ -11,17 +11,18 @@ from app.utils.security import normalize_email
 class SignupService:
     """Runs once for every new user. The caller commits."""
 
-    def __init__(self, session: AsyncSession, settings: Settings) -> None:
-        self.session = session
+    def __init__(self, db: AsyncSession, settings: Settings) -> None:
+        self.db = db
         self.settings = settings
 
     async def complete_signup(self, user: User) -> None:
+        """Grant superadmin if needed, create a workspace and welcome the user."""
         superadmin_email = normalize_email(self.settings.SUPERADMIN_EMAIL)
         if superadmin_email and user.email == superadmin_email:
             user.platform_role = PlatformRole.SUPERADMIN
-        await self.session.flush()
-        await OrganizationService(self.session).create_personal_organization(user)
-        await NotificationService(self.session).notify(
+        await self.db.flush()
+        await OrganizationService(self.db).create_personal_organization(user)
+        await NotificationService(self.db).notify(
             [user],
             kind=NotificationKind.WELCOME,
             title=f"Welcome to {self.settings.BRAND_NAME}",

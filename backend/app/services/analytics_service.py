@@ -16,13 +16,16 @@ ANALYTICS_FEATURE = "analytics"
 
 
 class AnalyticsService:
-    def __init__(self, session: AsyncSession, clock: Clock = utc_now) -> None:
-        self.analytics = AnalyticsRepository(session)
-        self.projects = ProjectRepository(session)
-        self.stored_files = StoredFileRepository(session)
+    """Service for organization overview analytics."""
+
+    def __init__(self, db: AsyncSession, clock: Clock = utc_now) -> None:
+        self.analytics = AnalyticsRepository(db)
+        self.projects = ProjectRepository(db)
+        self.stored_files = StoredFileRepository(db)
         self.clock = clock
 
     async def get_overview(self, organization: Organization) -> OverviewResponse:
+        """Return plan usage and limits for the organization."""
         plan = get_plan(organization.plan_id)
         return OverviewResponse(
             plan_id=plan.id,
@@ -36,6 +39,7 @@ class AnalyticsService:
         )
 
     async def get_charts(self, organization_id: UUID, days: ChartRange) -> OverviewChartsResponse:
+        """Return a zero-filled daily series of created projects."""
         series_length = int(days)
         end_day = utc_day(self.clock())
         starts_at, ends_at = day_window_bounds(end_day, series_length)

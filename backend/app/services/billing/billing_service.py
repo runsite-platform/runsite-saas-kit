@@ -43,6 +43,8 @@ EVENT_ERROR_MAX_LENGTH = 2000
 
 
 class BillingEventError(Exception):
+    """Error raised when a billing webhook event cannot be applied."""
+
     pass
 
 
@@ -54,22 +56,26 @@ UNRESOLVED_EVENT_RETRY_WINDOW = timedelta(hours=1)
 
 
 class BillingService:
-    def __init__(self, session: AsyncSession, settings: Settings, provider: PaymentProvider | None) -> None:
-        self.session = session
+    """Service for plans, checkout, subscriptions and billing webhooks."""
+
+    def __init__(self, db: AsyncSession, settings: Settings, provider: PaymentProvider | None) -> None:
+        self.db = db
         self.settings = settings
         self.provider = provider
         self.provider_config = ProviderConfig(settings)
-        self.subscriptions = SubscriptionRepository(session)
-        self.payments = PaymentRepository(session)
-        self.organizations = OrganizationRepository(session)
-        self.billing_events = BillingEventRepository(session)
+        self.subscriptions = SubscriptionRepository(db)
+        self.payments = PaymentRepository(db)
+        self.organizations = OrganizationRepository(db)
+        self.billing_events = BillingEventRepository(db)
 
     def list_plans(self) -> list[PlanResponse]:
+        """Return all plans with their availability for checkout."""
         return [self._plan_response(plan) for plan in PLANS.values()]
 
     async def get_overview(self, organization: Organization) -> BillingOverviewResponse:
+        """Return the organization's plan, subscription and usage."""
         subscription = await self.subscriptions.get_current_for_organization(organization.id)
-        usage = await UsageRepository(self.session).get_usage(organization.id)
+        usage = await UsageRepository(self.db).get_usage(organization.id)
         plan_override = None
         if organization.plan_override_id:
             plan_override = PlanOverrideResponse(
@@ -89,12 +95,14 @@ class BillingService:
         )
 
     async def list_payments(self, organization: Organization) -> list[PaymentResponse]:
+        """Return the organization's payment history."""
         payments = await self.payments.list_for_organization(organization.id)
         return [PaymentResponse.model_validate(payment) for payment in payments]
 
     async def create_checkout(
         self, organization: Organization, user: User, plan_id: str, interval: BillingInterval
     ) -> str:
+        """Create a provider checkout for a paid plan and return its URL."""
         provider = self._require_provider()
         plan = PLANS.get(plan_id)
         if plan is None or not is_paid_plan(plan) or not self.provider_config.is_plan_available(plan_id, interval):
@@ -119,6 +127,7 @@ class BillingService:
             raise self._provider_failure(error) from error
 
     async def create_portal_url(self, organization: Organization) -> str:
+        """Return the provider billing portal URL for the organization."""
         provider = self._require_provider()
         if organization.billing_provider != provider.name or not organization.billing_customer_id:
             raise not_found("Billing account")
@@ -128,6 +137,7 @@ class BillingService:
             raise self._provider_failure(error) from error
 
     async def cancel_subscription(self, organization: Organization) -> BillingOverviewResponse:
+        """Cancel the current subscription at the end of the period."""
         provider = self._require_provider()
         subscription = await self.subscriptions.get_current_for_organization(organization.id)
         if (
@@ -141,10 +151,11 @@ class BillingService:
         except BillingProviderError as error:
             raise self._provider_failure(error) from error
         subscription.cancel_at_period_end = True
-        await self.session.commit()
+        await self.db.commit()
         return await self.get_overview(organization)
 
     async def recompute_plan(self, organization: Organization) -> str:
+        """Recompute the organization's plan from override or subscription."""
         override_plan_id = organization.plan_override_id
         if override_plan_id is not None and override_plan_id in PLANS:
             plan_id = override_plan_id
@@ -152,26 +163,29 @@ class BillingService:
             granting = await self.subscriptions.get_plan_granting_for_organization(organization.id)
             plan_id = granting.plan_id if granting is not None and granting.plan_id in PLANS else FREE_PLAN_ID
         organization.plan_id = plan_id
-        await self.session.flush()
+        await self.db.flush()
         return plan_id
 
     async def set_plan_override(self, organization: Organization, plan_id: str | None, reason: str) -> None:
+        """Set or clear a manual plan override and recompute the plan."""
         if plan_id is not None and plan_id not in PLANS:
             raise BusinessError("plan_unavailable", f"Unknown plan '{plan_id}'", status_code=400)
         organization.plan_override_id = plan_id
         organization.plan_override_reason = reason
         await self.recompute_plan(organization)
-        await self.session.commit()
+        await self.db.commit()
 
     async def has_blocking_subscription(self, organization_id: UUID) -> bool:
+        """Return whether the organization has a blocking subscription."""
         return await self.subscriptions.has_blocking_subscription(organization_id)
 
     async def process_webhook_event(self, event: NormalizedEvent) -> WebhookOutcome:
+        """Record a webhook event idempotently and apply it once."""
         provider_name = self._require_provider().name
         await self.billing_events.insert_if_absent(
             provider=provider_name, event_id=event.event_id, event_type=event.event_type, payload=event.payload
         )
-        await self.session.commit()
+        await self.db.commit()
 
         billing_event = await self.billing_events.get_by_provider_event_id(
             provider_name, event.event_id, for_update=True
@@ -179,22 +193,23 @@ class BillingService:
         if billing_event is None:
             raise BillingEventError(f"Billing event {event.event_id} vanished after insert")
         if billing_event.processed_at is not None:
-            await self.session.commit()
+            await self.db.commit()
             return "duplicate"
 
         try:
             await self.apply_event(event)
             billing_event.processed_at = datetime.now(UTC)
             billing_event.error = None
-            await self.session.commit()
+            await self.db.commit()
         except Exception as error:
-            await self.session.rollback()
+            await self.db.rollback()
             logger.exception("Billing event %s/%s failed", provider_name, event.event_id)
             await self._record_event_error(provider_name, event.event_id, error)
             return "failed"
         return "processed"
 
     async def apply_event(self, event: NormalizedEvent) -> Organization | None:
+        """Apply a normalized event to subscriptions, payments and plan."""
         if event.kind == "ignored":
             return None
         provider_name = self._require_provider().name
@@ -321,7 +336,7 @@ class BillingService:
         if snapshot.customer_id:
             organization.billing_provider = provider_name
             organization.billing_customer_id = snapshot.customer_id
-        await self.session.flush()
+        await self.db.flush()
         return subscription
 
     async def _upsert_payment(
@@ -348,7 +363,7 @@ class BillingService:
                 payment.invoice_url = snapshot.invoice_url
         if existing is None:
             await self.payments.add(payment)
-        await self.session.flush()
+        await self.db.flush()
         return payment
 
     async def _record_event_error(self, provider_name: str, event_id: str, error: Exception) -> None:
@@ -356,4 +371,4 @@ class BillingService:
         if billing_event is None:
             return
         billing_event.error = f"{type(error).__name__}: {error}"[:EVENT_ERROR_MAX_LENGTH]
-        await self.session.commit()
+        await self.db.commit()

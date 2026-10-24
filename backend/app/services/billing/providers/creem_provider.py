@@ -64,6 +64,8 @@ SUBSCRIPTION_EVENT_KINDS: dict[str, EventKind] = {
 
 
 class CreemProvider:
+    """Creem payment provider."""
+
     name = "creem"
 
     def __init__(self, settings: Settings) -> None:
@@ -89,6 +91,7 @@ class CreemProvider:
         success_url: str,
         cancel_url: str,
     ) -> str:
+        """Create a Creem checkout and return its URL."""
         product_id = self.provider_config.price_reference(plan.id, interval)
         if product_id is None:
             raise BillingProviderError(f"No Creem product configured for {plan.id} ({interval})")
@@ -107,6 +110,7 @@ class CreemProvider:
         return str(checkout_url)
 
     async def create_portal_url(self, organization: Organization, return_url: str) -> str:
+        """Return the Creem customer portal URL."""
         response = await request_provider_json(
             "POST",
             self._url("/v1/customers/billing"),
@@ -119,6 +123,7 @@ class CreemProvider:
         return str(portal_url)
 
     async def cancel_subscription(self, subscription: Subscription, at_period_end: bool = True) -> None:
+        """Cancel the Creem subscription immediately or at period end."""
         body = {"mode": "scheduled", "onExecute": "cancel"} if at_period_end else {"mode": "immediate"}
         await request_provider_json(
             "POST",
@@ -128,6 +133,7 @@ class CreemProvider:
         )
 
     def parse_webhook(self, raw_body: bytes, headers: Mapping[str, str]) -> NormalizedEvent:
+        """Verify a Creem webhook signature and normalize the event."""
         verify_hmac_sha256_hex(
             raw_body, self.settings.CREEM_WEBHOOK_SECRET, header_value(headers, CREEM_SIGNATURE_HEADER)
         )
@@ -135,6 +141,7 @@ class CreemProvider:
 
 
 def normalize_creem_event(payload: dict[str, Any]) -> NormalizedEvent:
+    """Convert a Creem event payload into a NormalizedEvent."""
     try:
         return _normalize(payload)
     except (KeyError, TypeError, ValueError) as error:

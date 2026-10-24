@@ -14,23 +14,28 @@ if TYPE_CHECKING:
 
 
 class UserService:
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
-        self.oauth_accounts = OAuthAccountRepository(session)
+    """Service for user profiles and passwords."""
+
+    def __init__(self, db: AsyncSession) -> None:
+        self.db = db
+        self.oauth_accounts = OAuthAccountRepository(db)
 
     async def build_response(self, user: User, *, storage: "ObjectStorage | None" = None) -> UserResponse:
+        """Build the user response including Google link status."""
         google_linked = await self.oauth_accounts.has_provider(user.id, GOOGLE_PROVIDER)
         return UserResponse.from_user(user, storage=storage, google_linked=google_linked)
 
     async def update_profile(self, user: User, *, full_name: str) -> User:
+        """Update the user's full name."""
         user.full_name = full_name.strip()
-        await self.session.commit()
+        await self.db.commit()
         return user
 
     async def change_password(self, user: User, *, current_password: str | None, new_password: str) -> None:
+        """Verify the current password and set a new one."""
         if user.password_hash is not None and (
             not current_password or not verify_password(current_password, user.password_hash)
         ):
             raise BusinessError("invalid_credentials", "Current password is incorrect", status_code=400)
         user.password_hash = hash_password(new_password)
-        await self.session.commit()
+        await self.db.commit()

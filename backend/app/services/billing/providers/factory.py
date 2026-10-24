@@ -6,6 +6,7 @@ from app.services.billing.providers.stripe_provider import StripeProvider
 
 
 def build_payment_provider(settings: Settings) -> PaymentProvider | None:
+    """Return the configured payment provider, or None if billing is off."""
     if not settings.billing_enabled:
         return None
     match settings.BILLING_PROVIDER:

@@ -18,52 +18,56 @@ from app.utils.dependencies import (
     OrgOwnerMembership,
 )
 
-router = APIRouter(prefix="/orgs", tags=["organizations"])
+router = APIRouter()
 
 
 @router.get("")
 async def list_organizations(
-    user: CurrentUser, session: DbSession, storage: OptionalObjectStorage
+    user: CurrentUser, db: DbSession, storage: OptionalObjectStorage
 ) -> list[OrganizationSummary]:
-    return await OrganizationService(session, storage=storage).list_summaries_for_user(user.id)
+    """List organizations of the current user."""
+    return await OrganizationService(db, storage=storage).list_summaries_for_user(user.id)
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_organization(
-    data: OrganizationCreateRequest, user: CurrentUser, session: DbSession, storage: OptionalObjectStorage
+    data: OrganizationCreateRequest, user: CurrentUser, db: DbSession, storage: OptionalObjectStorage
 ) -> OrganizationSummary:
-    return await OrganizationService(session, storage=storage).create_organization(user, data)
+    """Create an organization owned by the current user."""
+    return await OrganizationService(db, storage=storage).create_organization(user, data)
 
 
 @router.get("/{org_id}")
 async def get_organization(
-    membership: CurrentMembership, session: DbSession, storage: OptionalObjectStorage
+    membership: CurrentMembership, db: DbSession, storage: OptionalObjectStorage
 ) -> OrganizationDetailResponse:
-    return await OrganizationService(session, storage=storage).get_organization_detail(membership)
+    """Return organization details."""
+    return await OrganizationService(db, storage=storage).get_organization_detail(membership)
 
 
 @router.patch("/{org_id}")
 async def update_organization(
     data: OrganizationUpdateRequest,
     membership: OrgManagerMembership,
-    session: DbSession,
+    db: DbSession,
     storage: OptionalObjectStorage,
 ) -> OrganizationDetailResponse:
-    return await OrganizationService(session, storage=storage).update_organization(membership, data)
+    """Update the organization."""
+    return await OrganizationService(db, storage=storage).update_organization(membership, data)
 
 
 @router.delete("/{org_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_organization(
-    membership: OrgOwnerMembership, session: DbSession, storage: OptionalObjectStorage
-) -> None:
-    await OrganizationService(session, storage=storage).delete_organization(membership)
+async def delete_organization(membership: OrgOwnerMembership, db: DbSession, storage: OptionalObjectStorage) -> None:
+    """Delete the organization."""
+    await OrganizationService(db, storage=storage).delete_organization(membership)
 
 
 @router.post("/{org_id}/transfer-ownership", status_code=status.HTTP_204_NO_CONTENT)
 async def transfer_ownership(
     data: TransferOwnershipRequest,
     membership: OrgOwnerMembership,
-    session: DbSession,
+    db: DbSession,
     notification_emails: NotificationEmailQueueDep,
 ) -> None:
-    await OrganizationService(session).transfer_ownership(membership, data.membership_id, notification_emails)
+    """Transfer organization ownership to another member."""
+    await OrganizationService(db).transfer_ownership(membership, data.membership_id, notification_emails)

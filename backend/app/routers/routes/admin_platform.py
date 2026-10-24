@@ -9,21 +9,21 @@ from app.services.setup_checklist_service import SetupChecklistService
 from app.utils.clock import Clock
 from app.utils.dependencies import AppSettings, DbSession, PlatformStaffUser, SuperadminUser, get_clock
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter()
 
 
 @router.get("/metrics")
 async def get_platform_metrics(
     _: SuperadminUser,
-    session: DbSession,
+    db: DbSession,
     clock: Annotated[Clock, Depends(get_clock)],
     days: Annotated[ChartRange, Query()] = ChartRange.LAST_30_DAYS,
 ) -> PlatformMetricsResponse:
-    return await AdminMetricsService(session, clock).get_metrics(days)
+    """Return platform metrics for the given period."""
+    return await AdminMetricsService(db, clock).get_metrics(days)
 
 
 @router.get("/setup")
-async def get_setup_checklist(
-    _: PlatformStaffUser, session: DbSession, settings: AppSettings
-) -> SetupChecklistResponse:
-    return await SetupChecklistService(session, settings).get_checklist()
+async def get_setup_checklist(_: PlatformStaffUser, db: DbSession, settings: AppSettings) -> SetupChecklistResponse:
+    """Return the platform setup checklist."""
+    return await SetupChecklistService(db, settings).get_checklist()

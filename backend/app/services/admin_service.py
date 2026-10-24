@@ -33,6 +33,7 @@ IMPERSONATION_TOKEN_MINUTES = 30
 
 
 def ensure_can_moderate(actor: User, target: User) -> None:
+    """Raise if the actor may not block or unblock the target user."""
     if target.id == actor.id:
         raise BusinessError("forbidden", "You cannot block or unblock yourself", 403)
     if target.platform_role == PlatformRole.SUPERADMIN:
@@ -42,6 +43,7 @@ def ensure_can_moderate(actor: User, target: User) -> None:
 
 
 def organization_summary(row: OrganizationListRow) -> AdminOrganizationSummary:
+    """Build an admin organization summary from a list row."""
     organization = row.organization
     return AdminOrganizationSummary(
         id=organization.id,
@@ -56,16 +58,20 @@ def organization_summary(row: OrganizationListRow) -> AdminOrganizationSummary:
 
 
 class AdminService:
-    def __init__(self, session: AsyncSession, settings: Settings, clock: Clock = utc_now) -> None:
-        self.session = session
+    """Service for platform admin user and organization management."""
+
+    def __init__(self, db: AsyncSession, settings: Settings, clock: Clock = utc_now) -> None:
+        self.db = db
         self.settings = settings
         self.clock = clock
-        self.queries = AdminQueryRepository(session)
+        self.queries = AdminQueryRepository(db)
 
     async def list_users(self, *, search: str | None) -> Page:
+        """Return a page of users matching the optional search."""
         return await self.queries.search_users(search=search.strip() if search else None)
 
     async def get_user_detail(self, user_id: UUID) -> AdminUserDetail:
+        """Return a user's details with memberships and login methods."""
         user = await self._get_user(user_id)
         membership_rows = await self.queries.list_user_memberships(user.id)
         return AdminUserDetail(
@@ -85,28 +91,31 @@ class AdminService:
         )
 
     async def block_user(self, actor: User, user_id: UUID) -> AdminUserSummary:
+        """Block a user and revoke their refresh tokens."""
         target = await self._get_user(user_id)
         ensure_can_moderate(actor, target)
         target.is_blocked = True
         await self.queries.delete_refresh_tokens(target.id)
-        await self.session.commit()
+        await self.db.commit()
         logger.info("User %s blocked by %s", target.id, actor.id)
         return AdminUserSummary.model_validate(target)
 
     async def unblock_user(self, actor: User, user_id: UUID) -> AdminUserSummary:
+        """Unblock a previously blocked user."""
         target = await self._get_user(user_id)
         ensure_can_moderate(actor, target)
         target.is_blocked = False
-        await self.session.commit()
+        await self.db.commit()
         logger.info("User %s unblocked by %s", target.id, actor.id)
         return AdminUserSummary.model_validate(target)
 
     async def create_verification_token(self, user_id: UUID) -> tuple[User, str | None]:
+        """Create an email verification token, or None if already verified."""
         user = await self._get_user(user_id)
         if user.is_email_verified:
             return user, None
         raw_token = generate_token()
-        self.session.add(
+        self.db.add(
             AuthToken(
                 user_id=user.id,
                 kind=AuthTokenKind.EMAIL_VERIFY,
@@ -114,18 +123,20 @@ class AdminService:
                 expires_at=self.clock() + EMAIL_VERIFY_TOKEN_LIFETIME,
             )
         )
-        await self.session.commit()
+        await self.db.commit()
         return user, raw_token
 
     async def set_admin_role(self, user_id: UUID, *, grant: bool) -> AdminUserSummary:
+        """Grant or revoke the platform admin role for a user."""
         target = await self._get_user(user_id)
         if target.platform_role == PlatformRole.SUPERADMIN:
             raise BusinessError("forbidden", "Superadmin roles cannot be changed here", 403)
         target.platform_role = PlatformRole.ADMIN if grant else PlatformRole.USER
-        await self.session.commit()
+        await self.db.commit()
         return AdminUserSummary.model_validate(target)
 
     async def impersonate(self, actor: User, user_id: UUID) -> ImpersonationResponse:
+        """Issue a short-lived access token to act as the target user."""
         target = await self._get_user(user_id)
         if target.platform_role == PlatformRole.SUPERADMIN:
             raise BusinessError("cannot_impersonate", "Superadmins cannot be impersonated", 403)
@@ -141,9 +152,11 @@ class AdminService:
         return ImpersonationResponse(access_token=access_token, expires_in=IMPERSONATION_TOKEN_MINUTES * 60)
 
     async def list_organizations(self, *, search: str | None, plan_id: str | None) -> Page:
+        """Return a page of organizations filtered by search and plan."""
         return await self.queries.search_organizations(search=search.strip() if search else None, plan_id=plan_id)
 
     async def get_organization_detail(self, organization_id: UUID) -> AdminOrganizationDetail:
+        """Return organization details with members, subscription and payments."""
         row = await self.queries.get_organization_row(organization_id)
         if row is None:
             raise not_found("Organization")
@@ -172,6 +185,7 @@ class AdminService:
     async def override_plan(
         self, actor: User, organization_id: UUID, request: PlanOverrideRequest, billing_service: BillingService
     ) -> AdminOrganizationDetail:
+        """Set or clear an organization's plan override."""
         if request.plan_id is not None and request.plan_id not in PLANS:
             raise BusinessError("plan_unavailable", f"Unknown plan '{request.plan_id}'", 400)
         organization = await self.queries.get_organization(organization_id)

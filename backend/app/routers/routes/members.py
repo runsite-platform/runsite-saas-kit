@@ -6,12 +6,13 @@ from app.schemas.members import MemberResponse, MemberRoleUpdateRequest
 from app.services.membership_service import MembershipService
 from app.utils.dependencies import CurrentMembership, DbSession, NotificationEmailQueueDep, OrgManagerMembership
 
-router = APIRouter(prefix="/orgs/{org_id}/members", tags=["members"])
+router = APIRouter()
 
 
 @router.get("")
-async def list_members(membership: CurrentMembership, session: DbSession) -> list[MemberResponse]:
-    return await MembershipService(session).list_members(membership.organization_id)
+async def list_members(membership: CurrentMembership, db: DbSession) -> list[MemberResponse]:
+    """List organization members."""
+    return await MembershipService(db).list_members(membership.organization_id)
 
 
 @router.patch("/{membership_id}")
@@ -19,10 +20,11 @@ async def change_member_role(
     membership_id: UUID,
     data: MemberRoleUpdateRequest,
     membership: OrgManagerMembership,
-    session: DbSession,
+    db: DbSession,
     notification_emails: NotificationEmailQueueDep,
 ) -> MemberResponse:
-    return await MembershipService(session, notification_emails).change_role(
+    """Change the role of a member."""
+    return await MembershipService(db, notification_emails).change_role(
         membership.organization_id, membership_id, data.role
     )
 
@@ -31,7 +33,8 @@ async def change_member_role(
 async def remove_member(
     membership_id: UUID,
     membership: CurrentMembership,
-    session: DbSession,
+    db: DbSession,
     notification_emails: NotificationEmailQueueDep,
 ) -> None:
-    await MembershipService(session, notification_emails).remove_member(membership, membership_id)
+    """Remove a member from the organization."""
+    await MembershipService(db, notification_emails).remove_member(membership, membership_id)

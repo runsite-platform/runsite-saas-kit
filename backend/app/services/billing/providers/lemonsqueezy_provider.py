@@ -59,6 +59,8 @@ GRACE_PERIOD_STATUSES = ("cancelled", "expired")
 
 
 class LemonSqueezyProvider:
+    """Lemon Squeezy payment provider."""
+
     name = "lemonsqueezy"
 
     def __init__(self, settings: Settings) -> None:
@@ -81,6 +83,7 @@ class LemonSqueezyProvider:
         success_url: str,
         cancel_url: str,
     ) -> str:
+        """Create a Lemon Squeezy checkout and return its URL."""
         variant_id = self.provider_config.price_reference(plan.id, interval)
         if variant_id is None:
             raise BillingProviderError(f"No Lemon Squeezy variant configured for {plan.id} ({interval})")
@@ -114,6 +117,7 @@ class LemonSqueezyProvider:
         return str(checkout_url)
 
     async def create_portal_url(self, organization: Organization, return_url: str) -> str:
+        """Return the Lemon Squeezy customer portal URL."""
         return await self._customer_portal_url(str(organization.billing_customer_id))
 
     async def _customer_portal_url(self, customer_id: str) -> str:
@@ -127,6 +131,7 @@ class LemonSqueezyProvider:
         return str(portal_url)
 
     async def cancel_subscription(self, subscription: Subscription, at_period_end: bool = True) -> None:
+        """Cancel the Lemon Squeezy subscription at period end."""
         await request_provider_json(
             "DELETE",
             f"{LEMONSQUEEZY_API_URL}/subscriptions/{subscription.provider_subscription_id}",
@@ -134,6 +139,7 @@ class LemonSqueezyProvider:
         )
 
     def parse_webhook(self, raw_body: bytes, headers: Mapping[str, str]) -> NormalizedEvent:
+        """Verify a Lemon Squeezy webhook signature and normalize the event."""
         verify_hmac_sha256_hex(
             raw_body,
             self.settings.LEMONSQUEEZY_WEBHOOK_SECRET,
@@ -150,6 +156,7 @@ def lemonsqueezy_event_id(event_name: str, raw_body: bytes) -> str:
 
 
 def normalize_lemonsqueezy_event(payload: dict[str, Any], raw_body: bytes, signing_secret: str) -> NormalizedEvent:
+    """Convert a Lemon Squeezy event payload into a NormalizedEvent."""
     try:
         return _normalize(payload, raw_body, signing_secret)
     except (KeyError, TypeError, ValueError) as error:

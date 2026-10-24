@@ -74,8 +74,8 @@ async def get_access_claims(
 AccessClaims = Annotated[AccessTokenClaims, Depends(get_access_claims)]
 
 
-async def get_current_user(claims: AccessClaims, session: DbSession) -> User:
-    user = await UserRepository(session).get_by_id(id=claims.user_id)
+async def get_current_user(claims: AccessClaims, db: DbSession) -> User:
+    user = await UserRepository(db).get_by_id(id=claims.user_id)
     if user is None:
         raise not_authenticated()
     if user.is_blocked:
@@ -97,8 +97,8 @@ VerifiedUser = Annotated[User, Depends(require_verified_email)]
 MembershipDependency = Callable[..., Awaitable[Membership]]
 
 
-async def get_current_membership(org_id: UUID, user: CurrentUser, session: DbSession) -> Membership:
-    membership = await MembershipRepository(session).get_for_user(org_id, user.id)
+async def get_current_membership(org_id: UUID, user: CurrentUser, db: DbSession) -> Membership:
+    membership = await MembershipRepository(db).get_for_user(org_id, user.id)
     if membership is None:
         raise not_found("Organization")
     return membership

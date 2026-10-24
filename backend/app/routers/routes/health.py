@@ -6,13 +6,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.config.logger import logger
 from app.utils.dependencies import DbSession
 
-router = APIRouter(prefix="/health", tags=["health"])
+router = APIRouter()
 
 
 @router.get("")
-async def health_check(session: DbSession) -> JSONResponse:
+async def health_check(db: DbSession) -> JSONResponse:
+    """Check that the API and database are available."""
     try:
-        await session.execute(text("SELECT 1"))
+        await db.execute(text("SELECT 1"))
     except (SQLAlchemyError, OSError) as error:
         logger.warning("Health check failed: %s", error)
         return JSONResponse(status_code=503, content={"status": "error"})

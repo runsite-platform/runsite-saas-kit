@@ -16,6 +16,7 @@ MANAGER_ROLES = (OrgRole.OWNER, OrgRole.ADMIN)
 
 
 def build_member_response(membership: Membership, user: User) -> MemberResponse:
+    """Build a member response from a membership and its user."""
     return MemberResponse(
         id=membership.id,
         user_id=user.id,
@@ -27,21 +28,26 @@ def build_member_response(membership: Membership, user: User) -> MemberResponse:
 
 
 def owner_cannot_be_removed(message: str) -> BusinessError:
+    """Return the error raised when an action targets the owner."""
     return BusinessError("owner_cannot_be_removed", message, status_code=400)
 
 
 class MembershipService:
-    def __init__(self, session: AsyncSession, notification_emails: NotificationEmailQueue | None = None) -> None:
-        self.session = session
-        self.membership_repository = MembershipRepository(session)
-        self.organization_repository = OrganizationRepository(session)
-        self.notification_service = NotificationService(session, notification_emails)
+    """Service for organization members."""
+
+    def __init__(self, db: AsyncSession, notification_emails: NotificationEmailQueue | None = None) -> None:
+        self.db = db
+        self.membership_repository = MembershipRepository(db)
+        self.organization_repository = OrganizationRepository(db)
+        self.notification_service = NotificationService(db, notification_emails)
 
     async def list_members(self, organization_id: UUID) -> list[MemberResponse]:
+        """Return all members of the organization."""
         rows = await self.membership_repository.list_with_users_for_organization(organization_id)
         return [build_member_response(membership, user) for membership, user in rows]
 
     async def change_role(self, organization_id: UUID, membership_id: UUID, role: str) -> MemberResponse:
+        """Change a non-owner member's role and notify them."""
         row = await self.membership_repository.get_with_user_in_organization(organization_id, membership_id)
         if row is None:
             raise not_found("Member")
@@ -60,10 +66,11 @@ class MembershipService:
                 link=f"/app/{organization.slug}/members",
                 organization_id=organization.id,
             )
-        await self.session.commit()
+        await self.db.commit()
         return build_member_response(membership, user)
 
     async def remove_member(self, actor_membership: Membership, membership_id: UUID) -> None:
+        """Remove a member or let the actor leave the organization."""
         target_membership = await self.membership_repository.get_in_organization(
             actor_membership.organization_id, membership_id
         )
@@ -77,11 +84,11 @@ class MembershipService:
         await self.membership_repository.delete(target_membership)
         if not is_leaving:
             await self._notify_removed_member(actor_membership.organization_id, target_membership.user_id)
-        await self.session.commit()
+        await self.db.commit()
 
     async def _notify_removed_member(self, organization_id: UUID, removed_user_id: UUID) -> None:
         organization = await self.organization_repository.get_by_id(id=organization_id)
-        removed_user = await UserRepository(self.session).get_by_id(id=removed_user_id)
+        removed_user = await UserRepository(self.db).get_by_id(id=removed_user_id)
         if organization is None or removed_user is None:
             return
         await self.notification_service.notify(

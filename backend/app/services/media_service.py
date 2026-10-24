@@ -14,44 +14,52 @@ MAX_IMAGE_BYTES = 2 * 1024 * 1024
 
 
 def avatar_storage_key(user_id: UUID) -> str:
+    """Return the storage key for a user's avatar."""
     return f"users/{user_id}/avatar"
 
 
 def logo_storage_key(organization_id: UUID) -> str:
+    """Return the storage key for an organization's logo."""
     return f"orgs/{organization_id}/logo"
 
 
 class MediaService:
-    def __init__(self, session: AsyncSession, storage: ObjectStorage | None) -> None:
-        self.session = session
+    """Service for user avatars and organization logos."""
+
+    def __init__(self, db: AsyncSession, storage: ObjectStorage | None) -> None:
+        self.db = db
         self.storage = storage
 
     async def set_user_avatar(self, user: User, upload: UploadFile) -> str:
+        """Upload the user's avatar and return its presigned URL."""
         storage = require_storage(self.storage)
         storage_key = avatar_storage_key(user.id)
         await self._store_image(storage, storage_key, upload)
         user.avatar_key = storage_key
-        await self.session.commit()
+        await self.db.commit()
         return storage.presigned_get_url(storage_key)
 
     async def remove_user_avatar(self, user: User) -> None:
+        """Clear the user's avatar and delete the stored object."""
         storage_key = user.avatar_key
         user.avatar_key = None
-        await self.session.commit()
+        await self.db.commit()
         await self._delete_object(storage_key)
 
     async def set_organization_logo(self, organization: Organization, upload: UploadFile) -> str:
+        """Upload the organization logo and return its presigned URL."""
         storage = require_storage(self.storage)
         storage_key = logo_storage_key(organization.id)
         await self._store_image(storage, storage_key, upload)
         organization.logo_key = storage_key
-        await self.session.commit()
+        await self.db.commit()
         return storage.presigned_get_url(storage_key)
 
     async def remove_organization_logo(self, organization: Organization) -> None:
+        """Clear the organization logo and delete the stored object."""
         storage_key = organization.logo_key
         organization.logo_key = None
-        await self.session.commit()
+        await self.db.commit()
         await self._delete_object(storage_key)
 
     async def _store_image(self, storage: ObjectStorage, storage_key: str, upload: UploadFile) -> None:

@@ -15,6 +15,7 @@ async def request_provider_json(
     headers: dict[str, str],
     json_body: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    """Send a provider API request and return the JSON object response."""
     try:
         async with httpx.AsyncClient(timeout=PROVIDER_TIMEOUT_SECONDS) as http_client:
             response = await http_client.request(method, url, headers=headers, json=json_body)

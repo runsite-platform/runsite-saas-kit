@@ -30,11 +30,15 @@ OAUTH_STATE_TOKEN_TYPE = "oauth_state"
 
 
 class GoogleOAuthError(Exception):
+    """Error raised when the Google OAuth flow fails."""
+
     pass
 
 
 @dataclass(frozen=True)
 class GoogleProfile:
+    """Google account profile returned by the userinfo endpoint."""
+
     account_id: str
     email: str
     email_verified: bool
@@ -42,21 +46,26 @@ class GoogleProfile:
 
 
 class GoogleOAuthService:
-    def __init__(self, session: AsyncSession, settings: Settings) -> None:
-        self.session = session
+    """Service for Google OAuth login."""
+
+    def __init__(self, db: AsyncSession, settings: Settings) -> None:
+        self.db = db
         self.settings = settings
-        self.users = UserRepository(session)
-        self.oauth_accounts = OAuthAccountRepository(session)
+        self.users = UserRepository(db)
+        self.oauth_accounts = OAuthAccountRepository(db)
 
     @property
     def redirect_uri(self) -> str:
+        """Return the OAuth callback URL."""
         return f"{self.settings.APP_URL}/api/auth/google/callback"
 
     def ensure_enabled(self) -> None:
+        """Raise if Google login is not configured."""
         if not self.settings.google_login_enabled:
             raise BusinessError("google_login_disabled", "Google login is not configured", status_code=404)
 
     def build_authorization(self) -> tuple[str, str]:
+        """Return the Google authorization URL and a signed state cookie."""
         state = generate_token()
         query = urlencode(
             {
@@ -76,6 +85,7 @@ class GoogleOAuthService:
         return f"{GOOGLE_AUTHORIZATION_URL}?{query}", state_cookie
 
     def verify_state(self, state: str | None, state_cookie: str | None) -> None:
+        """Raise if the OAuth state does not match the signed cookie."""
         if not state or not state_cookie:
             raise GoogleOAuthError("Missing OAuth state")
         try:
@@ -91,6 +101,7 @@ class GoogleOAuthService:
             raise GoogleOAuthError("OAuth state mismatch")
 
     async def fetch_profile(self, code: str) -> GoogleProfile:
+        """Exchange the code for a token and return the Google profile."""
         try:
             async with httpx.AsyncClient(timeout=GOOGLE_HTTP_TIMEOUT_SECONDS) as http_client:
                 token_response = await http_client.post(
@@ -124,6 +135,7 @@ class GoogleOAuthService:
         )
 
     async def resolve_user(self, profile: GoogleProfile) -> User:
+        """Return the user for the Google profile, linking or creating one."""
         linked_account = await self.oauth_accounts.get_by_provider_account(GOOGLE_PROVIDER, profile.account_id)
         if linked_account is not None:
             linked_user = await self.users.get_by_id(id=linked_account.user_id)
@@ -137,7 +149,7 @@ class GoogleOAuthService:
             user = await self.users.add(
                 User(email=profile.email, password_hash=None, full_name=profile.full_name, is_email_verified=True)
             )
-            await SignupService(self.session, self.settings).complete_signup(user)
+            await SignupService(self.db, self.settings).complete_signup(user)
         else:
             await self._secure_unproven_account(user)
             user.is_email_verified = True
@@ -152,4 +164,4 @@ class GoogleOAuthService:
             return
         # Whoever registered this email never proved owning it, so drop their password and sessions
         user.password_hash = None
-        await AuthTokenRepository(self.session).revoke_for_user(user.id, AuthTokenKind.REFRESH, utc_now())
+        await AuthTokenRepository(self.db).revoke_for_user(user.id, AuthTokenKind.REFRESH, utc_now())

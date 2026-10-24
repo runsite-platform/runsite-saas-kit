@@ -60,7 +60,7 @@ def prompt_password() -> str:
 
 
 async def create_superadmin(
-    session: AsyncSession,
+    db: AsyncSession,
     settings: Settings,
     *,
     email: str,
@@ -71,7 +71,7 @@ async def create_superadmin(
     normalized_email = email.strip().lower()
     if "@" not in normalized_email or normalized_email.startswith("@") or normalized_email.endswith("@"):
         raise CliError(f"'{email}' is not a valid email address")
-    promoted_user = await SuperadminService(session).promote_by_email(normalized_email)
+    promoted_user = await SuperadminService(db).promote_by_email(normalized_email)
     if promoted_user is not None:
         return CreateSuperadminResult(user_id=promoted_user.id, email=promoted_user.email, created=False)
     resolved_password = password if password is not None else password_prompt()
@@ -85,15 +85,15 @@ async def create_superadmin(
         is_email_verified=True,
         is_blocked=False,
     )
-    session.add(user)
-    await session.flush()
-    await SignupService(session, settings).complete_signup(user)
-    await session.commit()
+    db.add(user)
+    await db.flush()
+    await SignupService(db, settings).complete_signup(user)
+    await db.commit()
     return CreateSuperadminResult(user_id=user.id, email=user.email, created=True)
 
 
-async def seed_demo(session: AsyncSession) -> SeedDemoResult:
-    user = await AdminQueryRepository(session).get_user_by_email(DEMO_USER_EMAIL)
+async def seed_demo(db: AsyncSession) -> SeedDemoResult:
+    user = await AdminQueryRepository(db).get_user_by_email(DEMO_USER_EMAIL)
     user_created = user is None
     if user is None:
         user = User(
@@ -104,23 +104,23 @@ async def seed_demo(session: AsyncSession) -> SeedDemoResult:
             is_email_verified=True,
             is_blocked=False,
         )
-        session.add(user)
-        await session.flush()
+        db.add(user)
+        await db.flush()
 
-    organization = await session.scalar(select(Organization).where(Organization.slug == DEMO_ORGANIZATION_SLUG))
+    organization = await db.scalar(select(Organization).where(Organization.slug == DEMO_ORGANIZATION_SLUG))
     organization_created = organization is None
     if organization is None:
         organization = Organization(
             name=DEMO_ORGANIZATION_NAME, slug=DEMO_ORGANIZATION_SLUG, owner_id=user.id, plan_id="free"
         )
-        session.add(organization)
-        await session.flush()
-        session.add(Membership(organization_id=organization.id, user_id=user.id, role=OrgRole.OWNER))
+        db.add(organization)
+        await db.flush()
+        db.add(Membership(organization_id=organization.id, user_id=user.id, role=OrgRole.OWNER))
 
-    existing_names = set(await session.scalars(select(Project.name).where(Project.organization_id == organization.id)))
+    existing_names = set(await db.scalars(select(Project.name).where(Project.organization_id == organization.id)))
     missing_projects = [(name, description) for name, description in DEMO_PROJECTS if name not in existing_names]
     for name, description in missing_projects:
-        session.add(
+        db.add(
             Project(
                 organization_id=organization.id,
                 name=name,
@@ -129,7 +129,7 @@ async def seed_demo(session: AsyncSession) -> SeedDemoResult:
                 created_by_id=user.id,
             )
         )
-    await session.commit()
+    await db.commit()
     return SeedDemoResult(
         user_created=user_created, organization_created=organization_created, projects_created=len(missing_projects)
     )
@@ -152,15 +152,15 @@ async def run_command(arguments: argparse.Namespace, settings: Settings) -> int:
     if session_maker is None:
         raise CliError("The database is not configured")
     try:
-        async with session_maker() as session:
+        async with session_maker() as db:
             if arguments.command == "create-superadmin":
                 result = await create_superadmin(
-                    session, settings, email=arguments.email, password=arguments.password, full_name=arguments.name
+                    db, settings, email=arguments.email, password=arguments.password, full_name=arguments.name
                 )
                 action = "Created" if result.created else "Promoted"
                 print(f"{action} superadmin {result.email}")
             else:
-                seed_result = await seed_demo(session)
+                seed_result = await seed_demo(db)
                 print(
                     f"Demo data ready: user created={seed_result.user_created}, "
                     f"organization created={seed_result.organization_created}, "

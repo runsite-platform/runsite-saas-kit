@@ -28,19 +28,27 @@ ENDED_SUBSCRIPTION_STATUSES: tuple[SubscriptionStatus, ...] = (SubscriptionStatu
 
 
 class WebhookSignatureError(Exception):
+    """Error raised when a webhook signature is missing or invalid."""
+
     pass
 
 
 class WebhookPayloadError(ValueError):
+    """Error raised when a webhook payload is malformed."""
+
     pass
 
 
 class BillingProviderError(Exception):
+    """Error raised when a payment provider request fails."""
+
     pass
 
 
 @dataclass(frozen=True)
 class SubscriptionSnapshot:
+    """Provider-independent state of a subscription."""
+
     provider_subscription_id: str
     status: SubscriptionStatus
     customer_id: str | None = None
@@ -53,6 +61,8 @@ class SubscriptionSnapshot:
 
 @dataclass(frozen=True)
 class PaymentSnapshot:
+    """Provider-independent state of a payment."""
+
     provider_payment_id: str
     amount_cents: int
     currency: str
@@ -64,6 +74,8 @@ class PaymentSnapshot:
 
 @dataclass(frozen=True)
 class NormalizedEvent:
+    """Provider-independent billing webhook event."""
+
     event_id: str
     event_type: str
     kind: EventKind
@@ -75,6 +87,8 @@ class NormalizedEvent:
 
 
 class PaymentProvider(Protocol):
+    """Interface implemented by payment providers."""
+
     name: str
 
     async def create_checkout(
@@ -85,16 +99,25 @@ class PaymentProvider(Protocol):
         customer_email: str,
         success_url: str,
         cancel_url: str,
-    ) -> str: ...
+    ) -> str:
+        """Create a checkout session and return its URL."""
+        ...
 
-    async def create_portal_url(self, organization: Organization, return_url: str) -> str: ...
+    async def create_portal_url(self, organization: Organization, return_url: str) -> str:
+        """Return the customer billing portal URL."""
+        ...
 
-    async def cancel_subscription(self, subscription: Subscription, at_period_end: bool = True) -> None: ...
+    async def cancel_subscription(self, subscription: Subscription, at_period_end: bool = True) -> None:
+        """Cancel the subscription immediately or at period end."""
+        ...
 
-    def parse_webhook(self, raw_body: bytes, headers: Mapping[str, str]) -> NormalizedEvent: ...
+    def parse_webhook(self, raw_body: bytes, headers: Mapping[str, str]) -> NormalizedEvent:
+        """Verify a webhook request and return the normalized event."""
+        ...
 
 
 def checkout_metadata(organization_id: UUID, plan_id: str, interval: BillingInterval) -> dict[str, str]:
+    """Return the metadata attached to a checkout."""
     return {
         ORGANIZATION_METADATA_KEY: str(organization_id),
         PLAN_METADATA_KEY: plan_id,
@@ -103,6 +126,7 @@ def checkout_metadata(organization_id: UUID, plan_id: str, interval: BillingInte
 
 
 def sign_organization_id(organization_id: UUID, secret: str) -> str:
+    """Return an HMAC-SHA256 signature of the organization id."""
     return hmac.new(secret.encode(), f"billing-organization:{organization_id}".encode(), hashlib.sha256).hexdigest()
 
 
@@ -118,6 +142,7 @@ def verified_organization_id(metadata: Mapping[str, Any], secret: str) -> UUID |
 
 
 def verify_hmac_sha256_hex(raw_body: bytes, secret: str, signature: str | None) -> None:
+    """Raise WebhookSignatureError unless the HMAC-SHA256 signature matches."""
     if not secret or not signature:
         raise WebhookSignatureError("Missing webhook signature or signing secret")
     expected_signature = hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
@@ -126,6 +151,7 @@ def verify_hmac_sha256_hex(raw_body: bytes, secret: str, signature: str | None) 
 
 
 def load_json_payload(raw_body: bytes) -> dict[str, Any]:
+    """Parse the webhook body as a JSON object."""
     try:
         payload = json.loads(raw_body)
     except ValueError as error:
@@ -136,6 +162,7 @@ def load_json_payload(raw_body: bytes) -> dict[str, Any]:
 
 
 def parse_organization_id(value: object) -> UUID | None:
+    """Parse a UUID, returning None if it is missing or invalid."""
     if value is None:
         return None
     try:
@@ -145,6 +172,7 @@ def parse_organization_id(value: object) -> UUID | None:
 
 
 def parse_interval(value: object) -> BillingInterval | None:
+    """Parse a billing interval, returning None if it is missing or invalid."""
     if not value:
         return None
     try:
@@ -154,6 +182,7 @@ def parse_interval(value: object) -> BillingInterval | None:
 
 
 def parse_iso_datetime(value: object) -> datetime | None:
+    """Parse an ISO 8601 datetime, assuming UTC when naive."""
     if not value:
         return None
     parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
@@ -161,6 +190,7 @@ def parse_iso_datetime(value: object) -> datetime | None:
 
 
 def parse_unix_timestamp(value: object) -> datetime | None:
+    """Convert a Unix timestamp in seconds to a UTC datetime."""
     if value is None:
         return None
     return datetime.fromtimestamp(int(str(value)), tz=UTC)
@@ -170,6 +200,7 @@ MILLISECOND_TIMESTAMP_THRESHOLD = 10**11
 
 
 def parse_epoch_seconds_or_milliseconds(value: object) -> datetime | None:
+    """Parse an epoch in seconds or milliseconds, or an ISO datetime."""
     if value is None or isinstance(value, bool):
         return None
     try:
@@ -182,6 +213,7 @@ def parse_epoch_seconds_or_milliseconds(value: object) -> datetime | None:
 
 
 def header_value(headers: Mapping[str, str], name: str) -> str | None:
+    """Return a header value by case-insensitive name."""
     lowered_name = name.lower()
     for key, value in headers.items():
         if key.lower() == lowered_name:
@@ -190,6 +222,7 @@ def header_value(headers: Mapping[str, str], name: str) -> str | None:
 
 
 def reference_id(value: object) -> str | None:
+    """Return the id of a reference given as a value or an object with an id."""
     if value is None:
         return None
     if isinstance(value, Mapping):

@@ -12,21 +12,25 @@ def _ensure_series_length(days: int) -> None:
 
 
 def utc_day(moment: datetime) -> date:
+    """Return the UTC calendar date of the given moment."""
     return moment.astimezone(UTC).date()
 
 
 def window_start_day(end_day: date, days: int) -> date:
+    """Return the first day of a window of days ending on end_day."""
     _ensure_series_length(days)
     return end_day - timedelta(days=days - 1)
 
 
 def day_window_bounds(end_day: date, days: int) -> tuple[datetime, datetime]:
+    """Return UTC datetime bounds covering the day window."""
     starts_at = datetime.combine(window_start_day(end_day, days), time.min, tzinfo=UTC)
     ends_at = datetime.combine(end_day + timedelta(days=1), time.min, tzinfo=UTC)
     return starts_at, ends_at
 
 
 def zero_filled_daily_series(counts_by_day: Mapping[date, int], *, end_day: date, days: int) -> list[DailyCount]:
+    """Return daily counts for the window with missing days set to zero."""
     start_day = window_start_day(end_day, days)
     series_days = [start_day + timedelta(days=offset) for offset in range(days)]
     return [DailyCount(day=series_day, count=counts_by_day.get(series_day, 0)) for series_day in series_days]
