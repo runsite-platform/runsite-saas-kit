@@ -4,9 +4,9 @@ A free, open-source (MIT) SaaS starter built with FastAPI and React. Auth, organ
 with Stripe, Lemon Squeezy or Creem, a dashboard, file uploads, a platform admin panel and an example module are
 already built, so you can spend your time on the part your customers pay for.
 
-[![Deploy on Runsite](https://img.shields.io/badge/Deploy%20on-Runsite-0f172a?style=for-the-badge)](https://dashboard.runsite.app/templates/RUNSITE_TEMPLATE_ID)
+[![Deploy on Runsite](https://img.shields.io/badge/Deploy%20on-Runsite-0f172a?style=for-the-badge)](https://dashboard.runsite.app/templates/ff27d3cf-54c2-4ce3-9359-07be4bc08725)
 
-Deploying from the [Runsite template](https://dashboard.runsite.app/templates/RUNSITE_TEMPLATE_ID) creates the
+Deploying from the [Runsite template](https://dashboard.runsite.app/templates/ff27d3cf-54c2-4ce3-9359-07be4bc08725) creates the
 web service, a PostgreSQL database, an object storage bucket and an email service, and wires every environment
 variable. You get a working app (register, log in, create a project, invite a member, upload and delete files)
 without touching any configuration.
