@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from datetime import timedelta
-from urllib.parse import quote
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
 from app.constants.enums import NotificationKind, OrgRole
+from app.emails.links import AppLinks
 from app.models.invitation import Invitation
 from app.models.membership import Membership
 from app.models.user import User
@@ -47,6 +47,7 @@ class InvitationService:
     ) -> None:
         self.db = db
         self.settings = settings
+        self.links = AppLinks(settings)
         self.notification_service = NotificationService(db, notification_emails)
         self.organization_repository = OrganizationRepository(db)
         self.membership_repository = MembershipRepository(db)
@@ -55,7 +56,7 @@ class InvitationService:
 
     def build_invite_url(self, token: str) -> str:
         """Return the frontend URL for accepting an invitation token."""
-        return f"{self.settings.APP_URL}/invite/{quote(token)}"
+        return self.links.invitation(token)
 
     async def create_invitation(
         self, membership: Membership, inviter: User, data: InvitationCreateRequest
