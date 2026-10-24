@@ -22,8 +22,9 @@ from app.schemas.organizations import (
     PlanLimitsResponse,
 )
 from app.services.billing.plans import FREE_PLAN_ID, get_plan
+from app.services.email_service import EmailQueue
 from app.services.file_storage import ObjectStorage, delete_object_best_effort
-from app.services.notification_service import NotificationEmailQueue, NotificationService
+from app.services.notification_service import NotificationService
 from app.utils.exceptions import BusinessError, not_found
 from app.utils.security import utc_now
 from app.utils.slugs import generate_unique_slug
@@ -124,7 +125,7 @@ class OrganizationService:
         self,
         owner_membership: Membership,
         target_membership_id: UUID,
-        notification_emails: NotificationEmailQueue | None = None,
+        email_queue: EmailQueue | None = None,
     ) -> None:
         """Transfer ownership to another member and notify them."""
         target_membership = await self.membership_repository.get_in_organization(
@@ -140,7 +141,7 @@ class OrganizationService:
         organization.owner_id = target_membership.user_id
         new_owner = await UserRepository(self.db).get_by_id(id=target_membership.user_id)
         if new_owner is not None:
-            await NotificationService(self.db, notification_emails).notify(
+            await NotificationService(self.db, email_queue).notify(
                 [new_owner],
                 kind=NotificationKind.OWNERSHIP_TRANSFERRED,
                 title=f"You are now the owner of {organization.name}",

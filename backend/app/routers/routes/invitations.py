@@ -17,7 +17,6 @@ from app.utils.dependencies import (
     CurrentUser,
     DbSession,
     EmailQueueDep,
-    NotificationEmailQueueDep,
     OrgManagerMembership,
     VerifiedUser,
 )
@@ -79,7 +78,7 @@ async def accept_invitation(
     user: CurrentUser,
     db: DbSession,
     settings: AppSettings,
-    notification_emails: NotificationEmailQueueDep,
+    email_queue: EmailQueueDep,
 ) -> OrganizationSummary:
     """Accept an invitation for the current user."""
-    return await InvitationService(db, settings, notification_emails).accept_invitation(user, token)
+    return await InvitationService(db, settings, email_queue).accept_invitation(user, token)

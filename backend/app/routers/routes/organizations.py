@@ -12,7 +12,7 @@ from app.utils.dependencies import (
     CurrentMembership,
     CurrentUser,
     DbSession,
-    NotificationEmailQueueDep,
+    EmailQueueDep,
     OptionalObjectStorage,
     OrgManagerMembership,
     OrgOwnerMembership,
@@ -67,7 +67,7 @@ async def transfer_ownership(
     data: TransferOwnershipRequest,
     membership: OrgOwnerMembership,
     db: DbSession,
-    notification_emails: NotificationEmailQueueDep,
+    email_queue: EmailQueueDep,
 ) -> None:
     """Transfer organization ownership to another member."""
-    await OrganizationService(db).transfer_ownership(membership, data.membership_id, notification_emails)
+    await OrganizationService(db).transfer_ownership(membership, data.membership_id, email_queue)

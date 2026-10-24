@@ -1,12 +1,11 @@
 from collections.abc import Iterable
-from dataclasses import dataclass
-from typing import Protocol
 from uuid import UUID
 
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants.enums import NotificationKind
+from app.emails.contents import DEFAULT_NOTIFICATION_PATH, NotificationEmailContent
 from app.models.notification import Notification
 from app.models.user import User
 from app.repositories.notification_repository import (
@@ -15,42 +14,16 @@ from app.repositories.notification_repository import (
     NotificationRepository,
 )
 from app.schemas.notifications import NotificationEmailSettingItem, NotificationResponse
-from app.utils.exceptions import not_found
+from app.services.email_service import EmailQueue
+from app.services.notification_policy import NOTIFICATION_POLICIES, is_email_enabled, user_configurable_kinds
+from app.utils.exceptions import BusinessError, not_found
 from app.utils.security import utc_now
-
-# Whether a kind is emailed when the user has not changed the setting. Add new kinds here and in NotificationKind.
-EMAIL_ENABLED_BY_DEFAULT: dict[NotificationKind, bool] = {
-    NotificationKind.WELCOME: False,
-    NotificationKind.MEMBER_JOINED: True,
-    NotificationKind.MEMBER_ROLE_CHANGED: True,
-    NotificationKind.MEMBER_REMOVED: True,
-    NotificationKind.OWNERSHIP_TRANSFERRED: True,
-    NotificationKind.SYSTEM: True,
-}
-
-
-@dataclass(frozen=True)
-class NotificationEmail:
-    """Email to send for a notification."""
-
-    to: str
-    title: str
-    body: str
-    link: str | None
-
-
-class NotificationEmailQueue(Protocol):
-    """Queue that sends notification emails."""
-
-    def enqueue(self, email: NotificationEmail) -> None:
-        """Queue a notification email for sending."""
-        ...
 
 
 class NotificationService:
     """Creates in-app notifications and queues emails for them. `notify` does not commit; the caller does."""
 
-    def __init__(self, db: AsyncSession, email_queue: NotificationEmailQueue | None = None) -> None:
+    def __init__(self, db: AsyncSession, email_queue: EmailQueue | None = None) -> None:
         self.db = db
         self.email_queue = email_queue
         self.notifications = NotificationRepository(db)
@@ -83,10 +56,11 @@ class NotificationService:
         await self.db.flush()
 
         if self.email_queue is not None and unique_recipients:
-            email_settings = await self.email_settings.map_for_users([user.id for user in unique_recipients])
+            stored_settings = await self.email_settings.map_for_users([user.id for user in unique_recipients])
+            email_content = NotificationEmailContent(title=title, body=body, path=link or DEFAULT_NOTIFICATION_PATH)
             for user in unique_recipients:
-                if email_settings.get((user.id, kind), EMAIL_ENABLED_BY_DEFAULT[kind]):
-                    self.email_queue.enqueue(NotificationEmail(to=user.email, title=title, body=body, link=link))
+                if is_email_enabled(kind, stored_settings.get((user.id, kind))):
+                    self.email_queue.enqueue(user.email, email_content)
         return created_notifications
 
     async def list_notifications(self, user_id: UUID, *, read_filter: NotificationReadFilter) -> Page:
@@ -129,19 +103,22 @@ class NotificationService:
         await self.db.commit()
 
     async def get_email_settings(self, user_id: UUID) -> list[NotificationEmailSettingItem]:
-        """Return the user's email setting for every notification kind."""
+        """Return the user's email setting for every kind they can turn off."""
         stored_settings = await self.email_settings.map_for_users([user_id])
         return [
             NotificationEmailSettingItem(
-                kind=kind, email_enabled=stored_settings.get((user_id, kind), default_email_enabled)
+                kind=kind, email_enabled=is_email_enabled(kind, stored_settings.get((user_id, kind)))
             )
-            for kind, default_email_enabled in EMAIL_ENABLED_BY_DEFAULT.items()
+            for kind in user_configurable_kinds()
         ]
 
     async def update_email_settings(
         self, user_id: UUID, settings: list[NotificationEmailSettingItem]
     ) -> list[NotificationEmailSettingItem]:
         """Save the user's email settings and return all of them."""
+        for setting in settings:
+            if not NOTIFICATION_POLICIES[setting.kind].user_configurable:
+                raise BusinessError("validation_error", f"{setting.kind} cannot be turned off", status_code=422)
         for setting in settings:
             await self.email_settings.upsert(user_id, setting.kind, setting.email_enabled)
         await self.db.commit()

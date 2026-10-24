@@ -9,7 +9,8 @@ from app.repositories.membership_repository import MembershipRepository
 from app.repositories.organization_repository import OrganizationRepository
 from app.repositories.user import UserRepository
 from app.schemas.members import MemberResponse
-from app.services.notification_service import NotificationEmailQueue, NotificationService
+from app.services.email_service import EmailQueue
+from app.services.notification_service import NotificationService
 from app.utils.exceptions import BusinessError, forbidden, not_found
 
 MANAGER_ROLES = (OrgRole.OWNER, OrgRole.ADMIN)
@@ -35,11 +36,11 @@ def owner_cannot_be_removed(message: str) -> BusinessError:
 class MembershipService:
     """Service for organization members."""
 
-    def __init__(self, db: AsyncSession, notification_emails: NotificationEmailQueue | None = None) -> None:
+    def __init__(self, db: AsyncSession, email_queue: EmailQueue | None = None) -> None:
         self.db = db
         self.membership_repository = MembershipRepository(db)
         self.organization_repository = OrganizationRepository(db)
-        self.notification_service = NotificationService(db, notification_emails)
+        self.notification_service = NotificationService(db, email_queue)
 
     async def list_members(self, organization_id: UUID) -> list[MemberResponse]:
         """Return all members of the organization."""

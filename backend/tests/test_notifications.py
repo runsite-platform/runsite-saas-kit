@@ -4,11 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
 from app.constants.enums import NotificationKind, OrgRole
+from app.emails.contents import EmailContent, NotificationEmailContent
 from app.models.notification import Notification
 from app.models.user import User
 from app.repositories.membership_repository import MembershipRepository
+from app.repositories.notification_repository import NotificationEmailSettingRepository
 from app.schemas.notifications import NotificationEmailSettingItem
-from app.services.notification_service import NotificationEmail, NotificationService
+from app.services.notification_service import NotificationService
 from tests.factories import add_member, auth_headers, create_invitation, create_organization, create_user
 from tests.fakes import InMemoryEmailSender
 
@@ -17,10 +19,10 @@ NOTIFICATIONS_URL = "/api/me/notifications"
 
 class ListEmailQueue:
     def __init__(self) -> None:
-        self.emails: list[NotificationEmail] = []
+        self.emails: list[tuple[str, EmailContent]] = []
 
-    def enqueue(self, email: NotificationEmail) -> None:
-        self.emails.append(email)
+    def enqueue(self, to: str, content: EmailContent) -> None:
+        self.emails.append((to, content))
 
 
 async def notify(session: AsyncSession, user: User, title: str = "Hello") -> Notification:
@@ -201,7 +203,9 @@ async def test_notify_queues_email_only_when_enabled(db_session: AsyncSession) -
     )
 
     assert {notification.user_id for notification in created} == {subscribed_user.id, opted_out_user.id}
-    assert [email.to for email in email_queue.emails] == [subscribed_user.email]
+    assert email_queue.emails == [
+        (subscribed_user.email, NotificationEmailContent(title="Someone joined", body="", path="/app"))
+    ]
 
 
 async def test_welcome_kind_is_not_emailed_by_default(db_session: AsyncSession) -> None:
@@ -308,3 +312,51 @@ async def test_ownership_transfer_notifies_new_owner(
     notifications = await notifications_for(db_session, admin)
     assert [notification.kind for notification in notifications] == [NotificationKind.OWNERSHIP_TRANSFERRED]
     assert await MembershipRepository(db_session).get_for_user(organization.id, admin.id) is not None
+
+
+async def test_mandatory_kind_is_emailed_even_when_stored_off(db_session: AsyncSession) -> None:
+    user = await create_user(db_session)
+    await NotificationEmailSettingRepository(db_session).upsert(user.id, NotificationKind.MEMBER_REMOVED, False)
+    email_queue = ListEmailQueue()
+
+    await NotificationService(db_session, email_queue).notify(
+        [user], kind=NotificationKind.MEMBER_REMOVED, title="You were removed", link="/app"
+    )
+
+    assert [to for to, _content in email_queue.emails] == [user.email]
+
+
+async def test_email_settings_leave_out_mandatory_kinds(
+    client: httpx.AsyncClient, db_session: AsyncSession, settings: Settings
+) -> None:
+    user = await create_user(db_session)
+
+    response = await client.get(f"{NOTIFICATIONS_URL}/settings", headers=await auth_headers(user, settings=settings))
+
+    assert response.status_code == 200
+    assert [item["kind"] for item in response.json()["settings"]] == [
+        "welcome",
+        "member_joined",
+        "member_role_changed",
+    ]
+
+
+async def test_mandatory_kind_cannot_be_turned_off(
+    client: httpx.AsyncClient, db_session: AsyncSession, settings: Settings
+) -> None:
+    user = await create_user(db_session)
+
+    response = await client.put(
+        f"{NOTIFICATIONS_URL}/settings",
+        json={
+            "settings": [
+                {"kind": "member_joined", "email_enabled": False},
+                {"kind": "system", "email_enabled": False},
+            ]
+        },
+        headers=await auth_headers(user, settings=settings),
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["message"] == "system cannot be turned off"
+    assert await NotificationEmailSettingRepository(db_session).map_for_users([user.id]) == {}

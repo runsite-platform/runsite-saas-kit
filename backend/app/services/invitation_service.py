@@ -16,7 +16,8 @@ from app.repositories.organization_repository import OrganizationRepository
 from app.repositories.user import UserRepository
 from app.schemas.invitations import InvitationCreateRequest, InvitationPreviewResponse, InvitationResponse
 from app.schemas.organizations import OrganizationSummary
-from app.services.notification_service import NotificationEmailQueue, NotificationService
+from app.services.email_service import EmailQueue
+from app.services.notification_service import NotificationService
 from app.services.organization_service import user_display_name
 from app.services.plan_limits import PlanLimitsService
 from app.utils.exceptions import BusinessError, not_found
@@ -42,13 +43,11 @@ def invalid_invitation_token() -> BusinessError:
 class InvitationService:
     """Service for organization invitations."""
 
-    def __init__(
-        self, db: AsyncSession, settings: Settings, notification_emails: NotificationEmailQueue | None = None
-    ) -> None:
+    def __init__(self, db: AsyncSession, settings: Settings, email_queue: EmailQueue | None = None) -> None:
         self.db = db
         self.settings = settings
         self.links = AppLinks(settings)
-        self.notification_service = NotificationService(db, notification_emails)
+        self.notification_service = NotificationService(db, email_queue)
         self.organization_repository = OrganizationRepository(db)
         self.membership_repository = MembershipRepository(db)
         self.invitation_repository = InvitationRepository(db)

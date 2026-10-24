@@ -19,7 +19,6 @@ from app.services.billing.providers.base import PaymentProvider
 from app.services.billing.providers.factory import build_payment_provider
 from app.services.email_service import EmailQueue, EmailSender, EmailService, LoggingEmailSender, RunsiteEmailSender
 from app.services.file_storage import ObjectStorage, build_object_storage
-from app.services.notification_service import NotificationEmail, NotificationEmailQueue
 from app.utils.clock import Clock, utc_now
 from app.utils.exceptions import BusinessError, forbidden, not_found
 from app.utils.security import AccessTokenClaims, decode_access_token, not_authenticated
@@ -58,25 +57,6 @@ def get_email_queue(background_tasks: BackgroundTasks, email_service: EmailServi
 
 EmailQueueDep = Annotated[EmailQueue, Depends(get_email_queue)]
 
-
-class BackgroundNotificationEmailQueue:
-    """Sends notification emails after the response, so a slow email API never delays the request."""
-
-    def __init__(self, background_tasks: BackgroundTasks, email_service: EmailService) -> None:
-        self.background_tasks = background_tasks
-        self.email_service = email_service
-
-    def enqueue(self, email: NotificationEmail) -> None:
-        self.background_tasks.add_task(self.email_service.send_notification_email, email)
-
-
-def get_notification_email_queue(
-    background_tasks: BackgroundTasks, email_service: EmailServiceDep
-) -> NotificationEmailQueue:
-    return BackgroundNotificationEmailQueue(background_tasks, email_service)
-
-
-NotificationEmailQueueDep = Annotated[NotificationEmailQueue, Depends(get_notification_email_queue)]
 
 bearer_scheme = HTTPBearer(auto_error=False)
 

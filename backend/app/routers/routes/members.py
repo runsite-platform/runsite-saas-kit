@@ -4,7 +4,7 @@ from fastapi import APIRouter, status
 
 from app.schemas.members import MemberResponse, MemberRoleUpdateRequest
 from app.services.membership_service import MembershipService
-from app.utils.dependencies import CurrentMembership, DbSession, NotificationEmailQueueDep, OrgManagerMembership
+from app.utils.dependencies import CurrentMembership, DbSession, EmailQueueDep, OrgManagerMembership
 
 router = APIRouter()
 
@@ -21,12 +21,10 @@ async def change_member_role(
     data: MemberRoleUpdateRequest,
     membership: OrgManagerMembership,
     db: DbSession,
-    notification_emails: NotificationEmailQueueDep,
+    email_queue: EmailQueueDep,
 ) -> MemberResponse:
     """Change the role of a member."""
-    return await MembershipService(db, notification_emails).change_role(
-        membership.organization_id, membership_id, data.role
-    )
+    return await MembershipService(db, email_queue).change_role(membership.organization_id, membership_id, data.role)
 
 
 @router.delete("/{membership_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -34,7 +32,7 @@ async def remove_member(
     membership_id: UUID,
     membership: CurrentMembership,
     db: DbSession,
-    notification_emails: NotificationEmailQueueDep,
+    email_queue: EmailQueueDep,
 ) -> None:
     """Remove a member from the organization."""
-    await MembershipService(db, notification_emails).remove_member(membership, membership_id)
+    await MembershipService(db, email_queue).remove_member(membership, membership_id)
