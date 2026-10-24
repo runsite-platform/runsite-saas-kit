@@ -104,7 +104,9 @@ format check, `make makemigration name="..."` autogenerates an Alembic revision,
 containers, `make docker-build` builds the production image.
 
 Production image: `make docker-build` (or `docker build .`) builds the frontend and the backend into one image
-that serves the API and the SPA on port 8080 and runs `alembic upgrade head` on start.
+that serves the API and the SPA on `$PORT` (default 8080). On start, `deploy/entrypoint.sh` waits for PostgreSQL
+(`DB_WAIT_TIMEOUT`, default 180s), runs `alembic upgrade head` (retried `MIGRATION_ATTEMPTS` times, default 3; skip
+with `RUN_MIGRATIONS=false`) and starts uvicorn with `UVICORN_WORKERS` workers (default 1).
 
 Demo data: `cd backend && uv run python -m app.cli seed-demo` creates `demo@example.com` /
 `demo-password-123` with an organization and a few projects (safe to run twice).

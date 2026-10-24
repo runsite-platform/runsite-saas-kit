@@ -21,7 +21,11 @@ COPY backend/pyproject.toml backend/uv.lock ./
 RUN uv sync --frozen --no-dev
 COPY backend/ ./
 COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
+COPY --chmod=755 deploy/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN useradd --create-home --uid 10001 appuser && chown -R appuser /app
 USER appuser
+ENV PORT=8080
 EXPOSE 8080
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8080 --proxy-headers --forwarded-allow-ips '*'"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/api/health', timeout=4)" || exit 1
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
