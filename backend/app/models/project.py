@@ -4,8 +4,8 @@ from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.config.db import Base
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 from app.constants.enums import ProjectStatus
+from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class Project(UUIDPrimaryKeyMixin, TimestampMixin, Base):

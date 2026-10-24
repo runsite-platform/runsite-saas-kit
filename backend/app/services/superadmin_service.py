@@ -2,8 +2,8 @@ import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.models import User
 from app.constants.enums import PlatformRole
+from app.models import User
 from app.repositories.admin_query_repository import AdminQueryRepository
 
 logger = logging.getLogger(__name__)

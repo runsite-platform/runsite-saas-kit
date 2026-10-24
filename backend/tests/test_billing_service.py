@@ -4,8 +4,8 @@ import pytest
 from sqlalchemy import select
 
 from app.config.settings import Settings
-from app.models import Payment
 from app.constants.enums import BillingInterval, PaymentStatus, SubscriptionStatus
+from app.models import Payment
 from app.repositories.subscription_repository import SubscriptionRepository
 from app.services.billing.billing_service import BillingEventError, BillingService
 from app.services.billing.providers.base import NormalizedEvent, PaymentSnapshot, SubscriptionSnapshot

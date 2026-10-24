@@ -6,8 +6,8 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models import Organization, Payment, Subscription, User
 from app.constants.enums import BillingInterval, PaymentStatus
+from app.models import Organization, Payment, Subscription, User
 from app.models.subscription import BLOCKING_STATUSES
 from app.repositories.billing_event_repository import BillingEventRepository
 from app.repositories.organization_repository import OrganizationRepository

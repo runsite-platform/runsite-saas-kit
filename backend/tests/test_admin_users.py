@@ -1,7 +1,7 @@
 import uuid
 
-from app.models import OAuthAccount
 from app.constants.enums import PlatformRole
+from app.models import OAuthAccount
 from tests.factories import auth_headers, create_organization, create_user
 
 

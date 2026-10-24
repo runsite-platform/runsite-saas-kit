@@ -4,8 +4,8 @@ from sqlalchemy import Boolean, DateTime, String, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.config.db import Base
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 from app.constants.enums import PlatformRole
+from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):

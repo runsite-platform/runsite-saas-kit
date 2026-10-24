@@ -3,8 +3,8 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.exc import IntegrityError
 
 from app.config.db import Base
-from app.models import BillingEvent, Organization, Payment, Subscription
 from app.constants.enums import BillingInterval, PaymentStatus, SubscriptionStatus
+from app.models import BillingEvent, Organization, Payment, Subscription
 from tests.factories import create_organization, create_user
 
 

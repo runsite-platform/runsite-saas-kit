@@ -1,8 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.models.auth_token import AuthToken
 from app.constants.enums import AuthTokenKind
+from app.models.auth_token import AuthToken
 from app.utils.repository import SQLAlchemyRepository
 
 

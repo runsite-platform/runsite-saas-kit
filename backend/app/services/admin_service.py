@@ -5,8 +5,8 @@ from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
-from app.models import AuthToken, User
 from app.constants.enums import AuthTokenKind, PlatformRole
+from app.models import AuthToken, User
 from app.repositories.admin_query_repository import AdminQueryRepository, OrganizationListRow
 from app.schemas.admin import (
     AdminOrganizationDetail,

@@ -5,8 +5,8 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint, 
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.config.db import Base
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 from app.constants.enums import SubscriptionStatus
+from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 
 PLAN_GRANTING_STATUSES: tuple[SubscriptionStatus, ...] = (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE)
 BLOCKING_STATUSES: tuple[SubscriptionStatus, ...] = (

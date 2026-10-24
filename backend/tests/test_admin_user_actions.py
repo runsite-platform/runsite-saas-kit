@@ -3,8 +3,8 @@ from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select
 
-from app.models import AuthToken
 from app.constants.enums import AuthTokenKind, PlatformRole
+from app.models import AuthToken
 from app.utils.security import generate_token, hash_token
 from tests.factories import auth_headers, create_user
 

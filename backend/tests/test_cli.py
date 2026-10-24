@@ -10,8 +10,8 @@ from app.cli import (
     create_superadmin,
     seed_demo,
 )
-from app.models import Membership, Organization, Project, User
 from app.constants.enums import PlatformRole
+from app.models import Membership, Organization, Project, User
 from app.services.superadmin_service import SuperadminService, promote_superadmin_on_startup
 from app.utils.security import verify_password
 from tests.factories import create_user

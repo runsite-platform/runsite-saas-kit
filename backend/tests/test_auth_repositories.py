@@ -3,8 +3,8 @@ from datetime import timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.auth_token import AuthToken
 from app.constants.enums import AuthTokenKind
+from app.models.auth_token import AuthToken
 from app.models.oauth_account import OAuthAccount
 from app.models.user import User
 from app.repositories.auth_token import AuthTokenRepository
