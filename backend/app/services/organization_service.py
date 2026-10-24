@@ -114,9 +114,11 @@ class OrganizationService:
         """Delete the organization and its stored objects."""
         organization = membership.organization
         await self._ensure_no_blocking_subscription(organization)
-        await self._delete_organization_objects(organization)
+        organization_id = organization.id
+        storage_keys = await self._list_organization_storage_keys(organization)
         await self.organization_repository.delete(organization)
         await self.db.commit()
+        await self._delete_organization_objects(organization_id, storage_keys)
 
     async def transfer_ownership(
         self,
@@ -156,17 +158,20 @@ class OrganizationService:
                 status_code=409,
             )
 
-    async def _delete_organization_objects(self, organization: Organization) -> None:
+    async def _list_organization_storage_keys(self, organization: Organization) -> list[str]:
         storage_keys = await StoredFileRepository(self.db).list_storage_keys(organization.id)
         if organization.logo_key:
             storage_keys.append(organization.logo_key)
+        return storage_keys
+
+    async def _delete_organization_objects(self, organization_id: UUID, storage_keys: list[str]) -> None:
         if not storage_keys:
             return
         if self.storage is None:
             logger.warning(
                 "Storage is not configured; %d objects of organization %s were left in the bucket",
                 len(storage_keys),
-                organization.id,
+                organization_id,
             )
             return
         for position, storage_key in enumerate(storage_keys):
@@ -174,7 +179,7 @@ class OrganizationService:
                 logger.warning(
                     "%d objects of organization %s were left in the bucket",
                     len(storage_keys) - position,
-                    organization.id,
+                    organization_id,
                 )
                 return
 

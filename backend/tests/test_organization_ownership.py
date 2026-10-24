@@ -81,8 +81,8 @@ async def test_delete_runs_object_cleanup_hook(
 ) -> None:
     cleaned_organization_ids: list[uuid.UUID] = []
 
-    async def record_cleanup(self: OrganizationService, organization: Organization) -> None:
-        cleaned_organization_ids.append(organization.id)
+    async def record_cleanup(self: OrganizationService, organization_id: uuid.UUID, storage_keys: list[str]) -> None:
+        cleaned_organization_ids.append(organization_id)
 
     monkeypatch.setattr(OrganizationService, "_delete_organization_objects", record_cleanup)
     owner = await create_user(db_session)
