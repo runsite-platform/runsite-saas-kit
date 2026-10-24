@@ -2,16 +2,17 @@ import uuid
 from dataclasses import dataclass
 from datetime import timedelta
 
-from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import Settings
 from app.constants.enums import AuthTokenKind
+from app.emails.contents import PasswordResetEmailContent, VerifyEmailContent
+from app.emails.links import AppLinks
 from app.models.auth_token import AuthToken
 from app.models.user import User
 from app.repositories.auth_token import AuthTokenRepository
 from app.repositories.user import UserRepository
-from app.services.email_service import EmailService
+from app.services.email_service import EmailQueue
 from app.services.signup_service import SignupService
 from app.utils.exceptions import BusinessError
 from app.utils.security import (
@@ -58,17 +59,11 @@ def invalid_token() -> BusinessError:
 class AuthService:
     """Service for password authentication and session management."""
 
-    def __init__(
-        self,
-        db: AsyncSession,
-        settings: Settings,
-        email_service: EmailService,
-        background_tasks: BackgroundTasks,
-    ) -> None:
+    def __init__(self, db: AsyncSession, settings: Settings, email_queue: EmailQueue) -> None:
         self.db = db
         self.settings = settings
-        self.email_service = email_service
-        self.background_tasks = background_tasks
+        self.email_queue = email_queue
+        self.links = AppLinks(settings)
         self.users = UserRepository(db)
         self.tokens = AuthTokenRepository(db)
 
@@ -161,7 +156,7 @@ class AuthService:
         if user is None or user.is_blocked:
             return
         token = await self._create_single_use_token(user, AuthTokenKind.PASSWORD_RESET, PASSWORD_RESET_TOKEN_LIFETIME)
-        self.background_tasks.add_task(self.email_service.send_password_reset_email, user, token)
+        self.email_queue.enqueue(user.email, PasswordResetEmailContent(link=self.links.reset_password(token)))
         await self.db.commit()
 
     async def reset_password(self, *, raw_token: str, new_password: str) -> None:
@@ -208,4 +203,4 @@ class AuthService:
 
     async def _schedule_verification_email(self, user: User) -> None:
         token = await self._create_single_use_token(user, AuthTokenKind.EMAIL_VERIFY, EMAIL_VERIFY_TOKEN_LIFETIME)
-        self.background_tasks.add_task(self.email_service.send_verification_email, user, token)
+        self.email_queue.enqueue(user.email, VerifyEmailContent(link=self.links.verify_email(token)))

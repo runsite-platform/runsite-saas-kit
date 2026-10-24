@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, Request, Response, status
+from fastapi import APIRouter, Cookie, Depends, Request, Response, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,7 +25,7 @@ from app.services.google_oauth_service import (
     GoogleOAuthService,
 )
 from app.services.user_service import UserService
-from app.utils.dependencies import AppSettings, DbSession, EmailServiceDep, OptionalObjectStorage
+from app.utils.dependencies import AppSettings, DbSession, EmailQueueDep, OptionalObjectStorage
 from app.utils.exceptions import BusinessError
 from app.utils.rate_limit import ClientIp, RateLimiterDep
 
@@ -36,11 +36,9 @@ REFRESH_COOKIE_NAME = "refresh_token"
 REFRESH_COOKIE_PATH = "/api/auth"
 
 
-def get_auth_service(
-    db: DbSession, settings: AppSettings, email_service: EmailServiceDep, background_tasks: BackgroundTasks
-) -> AuthService:
+def get_auth_service(db: DbSession, settings: AppSettings, email_queue: EmailQueueDep) -> AuthService:
     """Build the auth service for the request."""
-    return AuthService(db, settings, email_service, background_tasks)
+    return AuthService(db, settings, email_queue)
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]

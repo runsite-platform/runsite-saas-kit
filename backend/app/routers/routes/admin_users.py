@@ -1,9 +1,10 @@
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter
 from fastapi_pagination import Page
 
+from app.emails.contents import VerifyEmailContent
+from app.emails.links import AppLinks
 from app.schemas.admin import (
     AdminUserDetail,
     AdminUserSummary,
@@ -11,8 +12,7 @@ from app.schemas.admin import (
     ResendVerificationResponse,
 )
 from app.services.admin_service import AdminService
-from app.services.email_service import EmailService
-from app.utils.dependencies import AppSettings, DbSession, PlatformStaffUser, SuperadminUser, get_email_service
+from app.utils.dependencies import AppSettings, DbSession, EmailQueueDep, PlatformStaffUser, SuperadminUser
 from app.utils.pagination import SearchQuery
 
 router = APIRouter()
@@ -55,14 +55,13 @@ async def resend_verification(
     _: PlatformStaffUser,
     db: DbSession,
     settings: AppSettings,
-    background_tasks: BackgroundTasks,
-    email_service: Annotated[EmailService, Depends(get_email_service)],
+    email_queue: EmailQueueDep,
 ) -> ResendVerificationResponse:
     """Resend the email verification link to a user."""
     user, raw_token = await AdminService(db, settings).create_verification_token(user_id)
     if raw_token is None:
         return ResendVerificationResponse(sent=False)
-    background_tasks.add_task(email_service.send_verification_email, user, raw_token)
+    email_queue.enqueue(user.email, VerifyEmailContent(link=AppLinks(settings).verify_email(raw_token)))
     return ResendVerificationResponse(sent=True)
 
 

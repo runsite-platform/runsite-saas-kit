@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, status
+from fastapi import APIRouter, status
 
+from app.emails.contents import InvitationEmailContent
 from app.schemas.invitations import (
     InvitationCreatedResponse,
     InvitationCreateRequest,
@@ -15,7 +16,7 @@ from app.utils.dependencies import (
     AppSettings,
     CurrentUser,
     DbSession,
-    EmailServiceDep,
+    EmailQueueDep,
     NotificationEmailQueueDep,
     OrgManagerMembership,
     VerifiedUser,
@@ -36,21 +37,21 @@ async def list_invitations(
 @organization_invitations_router.post("", status_code=status.HTTP_201_CREATED)
 async def create_invitation(
     data: InvitationCreateRequest,
-    background_tasks: BackgroundTasks,
     membership: OrgManagerMembership,
     inviter: VerifiedUser,
     db: DbSession,
     settings: AppSettings,
-    email_service: EmailServiceDep,
+    email_queue: EmailQueueDep,
 ) -> InvitationCreatedResponse:
     """Invite a user to the organization by email."""
     created_invitation = await InvitationService(db, settings).create_invitation(membership, inviter, data)
-    background_tasks.add_task(
-        email_service.send_invitation_email,
-        email=created_invitation.invitation.email,
-        organization_name=membership.organization.name,
-        inviter_name=user_display_name(inviter),
-        token=created_invitation.token,
+    email_queue.enqueue(
+        created_invitation.invitation.email,
+        InvitationEmailContent(
+            link=created_invitation.invite_url,
+            organization_name=membership.organization.name,
+            inviter_name=user_display_name(inviter),
+        ),
     )
     return InvitationCreatedResponse(
         invitation=InvitationResponse.model_validate(created_invitation.invitation),
