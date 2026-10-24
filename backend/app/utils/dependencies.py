@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.db import get_db_session
 from app.config.settings import Settings, get_settings
 from app.constants.enums import OrgRole, PlatformRole
+from app.emails.contents import EmailContent
 from app.models.membership import Membership
 from app.models.user import User
 from app.repositories.membership_repository import MembershipRepository
@@ -16,7 +17,7 @@ from app.repositories.user import UserRepository
 from app.services.billing.plans import FEATURE_REQUIRED_PLAN, get_plan
 from app.services.billing.providers.base import PaymentProvider
 from app.services.billing.providers.factory import build_payment_provider
-from app.services.email_service import EmailSender, EmailService, LoggingEmailSender, RunsiteEmailSender
+from app.services.email_service import EmailQueue, EmailSender, EmailService, LoggingEmailSender, RunsiteEmailSender
 from app.services.file_storage import ObjectStorage, build_object_storage
 from app.services.notification_service import NotificationEmail, NotificationEmailQueue
 from app.utils.clock import Clock, utc_now
@@ -38,6 +39,24 @@ def get_email_service(settings: AppSettings, sender: Annotated[EmailSender, Depe
 
 
 EmailServiceDep = Annotated[EmailService, Depends(get_email_service)]
+
+
+class BackgroundEmailQueue:
+    """Sends emails after the response, so a slow email API never delays the request."""
+
+    def __init__(self, background_tasks: BackgroundTasks, email_service: EmailService) -> None:
+        self.background_tasks = background_tasks
+        self.email_service = email_service
+
+    def enqueue(self, to: str, content: EmailContent) -> None:
+        self.background_tasks.add_task(self.email_service.send, to, content)
+
+
+def get_email_queue(background_tasks: BackgroundTasks, email_service: EmailServiceDep) -> EmailQueue:
+    return BackgroundEmailQueue(background_tasks, email_service)
+
+
+EmailQueueDep = Annotated[EmailQueue, Depends(get_email_queue)]
 
 
 class BackgroundNotificationEmailQueue:

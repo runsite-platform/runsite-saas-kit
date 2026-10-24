@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     EMAIL_API_KEY: str = ""
     EMAIL_API_URL: str = "https://api.runsite.app/emails"
     EMAIL_FROM: str = "Acme <noreply@example.com>"
+    EMAIL_REPLY_TO: str = ""
     REQUIRE_EMAIL_VERIFICATION: bool = False
 
     S3_ACCESS_KEY_ID: str = ""

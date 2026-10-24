@@ -1,15 +1,17 @@
 import html
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from string import Template
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 from urllib.parse import quote
 
 import httpx
 
 from app.config.settings import Settings
+from app.emails.contents import EmailContent
+from app.emails.renderer import DEFAULT_LOCALE, EmailRenderer
 from app.models.user import User
 
 if TYPE_CHECKING:
@@ -30,6 +32,8 @@ class EmailMessage:
     subject: str
     html: str
     text: str
+    reply_to: str | None = None
+    headers: dict[str, str] = field(default_factory=dict)
 
 
 class EmailSender(Protocol):
@@ -37,6 +41,14 @@ class EmailSender(Protocol):
 
     async def send(self, message: EmailMessage) -> None:
         """Send the email message."""
+        ...
+
+
+class EmailQueue(Protocol):
+    """Queue that sends emails outside the request."""
+
+    def enqueue(self, to: str, content: EmailContent) -> None:
+        """Queue an email for sending."""
         ...
 
 
@@ -62,13 +74,17 @@ class RunsiteEmailSender:
 
     async def send(self, message: EmailMessage) -> None:
         """Post the email to the Runsite email API."""
-        payload = {
+        payload: dict[str, Any] = {
             "from": self.settings.EMAIL_FROM,
             "to": [message.to],
             "subject": message.subject,
             "message": message.html,
             "text": message.text,
         }
+        if message.reply_to:
+            payload["reply_to"] = [message.reply_to]
+        if message.headers:
+            payload["headers"] = message.headers
         async with httpx.AsyncClient(timeout=self.timeout_seconds) as http_client:
             response = await http_client.post(
                 self.settings.EMAIL_API_URL, headers={"Api-Key": self.settings.EMAIL_API_KEY}, json=payload
@@ -92,9 +108,26 @@ class LoggingEmailSender:
 class EmailService:
     """Service for sending transactional emails from templates."""
 
-    def __init__(self, sender: EmailSender, settings: Settings) -> None:
+    def __init__(self, sender: EmailSender, settings: Settings, renderer: EmailRenderer | None = None) -> None:
         self.sender = sender
         self.settings = settings
+        self.renderer = renderer or EmailRenderer(settings)
+
+    async def send(self, to: str, content: EmailContent, *, locale: str = DEFAULT_LOCALE) -> None:
+        """Render and send an email. Never raises: failures are logged."""
+        try:
+            rendered = self.renderer.render(content, locale=locale)
+            await self.sender.send(
+                EmailMessage(
+                    to=to,
+                    subject=rendered.subject,
+                    html=rendered.html,
+                    text=rendered.text,
+                    reply_to=self.settings.EMAIL_REPLY_TO or None,
+                )
+            )
+        except Exception:
+            logger.exception("Failed to send email %r (%s) to %s", content.template_name, content.category.value, to)
 
     async def send_verification_email(self, user: User, token: str) -> None:
         """Send the email address verification link."""

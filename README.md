@@ -127,6 +127,7 @@ feature; nothing needs a code change.
 | `EMAIL_API_KEY` | empty | Sending email through the Runsite Email API. Empty: emails are logged. |
 | `EMAIL_API_URL` | `https://api.runsite.app/emails` | Email API endpoint. |
 | `EMAIL_FROM` | `Acme <noreply@example.com>` | Sender address. |
+| `EMAIL_REPLY_TO` | empty | Reply-To address for every email, e.g. a support inbox. |
 | `REQUIRE_EMAIL_VERIFICATION` | `false` | Requires a verified email to invite members and start checkout; shows a "verify your email" banner. |
 | `S3_ACCESS_KEY_ID` | empty | File storage (with the next three). Also deletes objects unless `S3_DELETE_*` is set. |
 | `S3_SECRET_ACCESS_KEY` | empty | File storage. |
