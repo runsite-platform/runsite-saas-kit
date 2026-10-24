@@ -66,20 +66,15 @@ Saving redeploys the service.
 Requirements: Docker, Python 3.12 with [uv](https://docs.astral.sh/uv/), Node.js 22.
 
 ```bash
-cp .env.example .env
-make db-up
-make install
-make migrate
-make dev-backend
+make run
 ```
 
-In a second terminal:
+`make run` creates `.env` from `.env.example` if it is missing, starts the containers, installs dependencies on the
+first run, applies migrations and starts the backend and the frontend together (Ctrl+C stops both). Open
+http://localhost:5173.
 
-```bash
-make dev-frontend
-```
-
-Open http://localhost:5173. The Vite dev server proxies `/api` to the backend on port 8000.
+To run the steps by hand: `make db-up`, `make install`, `make migrate`, then `make dev-backend` and, in a second
+terminal, `make dev-frontend`. The Vite dev server proxies `/api` to the backend on port 8000.
 
 `make db-up` starts PostgreSQL (port 5432, user, password and database `saaskit`, plus `saaskit_test` for tests),
 Mailpit (http://localhost:8025) and MinIO (S3 API on port 9000, console on http://localhost:9001, user `saaskit`,
@@ -99,8 +94,8 @@ Ports already taken? Set them in `.env` (the app ignores these; docker compose a
 | `VITE_API_PROXY_TARGET` | `http://localhost:8000` | Vite proxy target when you run `npm run dev` directly (shell variable). |
 | `TEST_DATABASE_URL` | derived from `POSTGRES_PORT` | Test database. The Makefile sets it; export it yourself for direct `pytest` runs. |
 
-Other targets: `make test-backend` and `make test-frontend` run the tests, `make lint` runs ruff, ESLint and the
-format check, `make makemigration name="..."` autogenerates an Alembic revision, `make db-down` stops the
+Other targets: `make test` runs all tests, `make check` runs lint, the type check and all tests, `make lint`
+runs ruff, ESLint and the format check, `make makemigration name="..."` autogenerates an Alembic revision, `make db-down` stops the
 containers, `make docker-build` builds the production image.
 
 Production image: `make docker-build` (or `docker build .`) builds the frontend and the backend into one image
@@ -332,7 +327,8 @@ whenever you like.
 
 ## Add your own module
 
-The `projects` module is the reference. Copy it layer by layer and rename `project` to your entity. A request
+Coding agents (Claude Code, Cursor, Codex) read the rules in `AGENTS.md` (`CLAUDE.md` imports it). The `projects`
+module is the reference. Copy it layer by layer and rename `project` to your entity. A request
 flows route → dependencies (current user, membership, role, plan feature) → service → repository → model.
 
 | Layer | Projects example | What to do |
@@ -359,11 +355,12 @@ routes with `require_feature("your_feature")`.
 ## Tests
 
 ```bash
-make test-backend
-make test-frontend
+make test     # backend and frontend
+make check    # lint, type check and tests
 ```
 
-Both run memory-capped and time-limited. Backend tests use the `saaskit_test` database from docker-compose and
+`make test-backend` and `make test-frontend` run one side. Tests run memory-capped (systemd on Linux) and
+time-limited where the tools are available. Backend tests use the `saaskit_test` database from docker-compose and
 roll back every test. Frontend tests run with Vitest. `backend/tests/test_project_docs.py` checks that this README
 and `.env.example` list every setting, and `frontend/src/i18n/translationKeys.test.ts` checks that every
 translation key used in the code exists.

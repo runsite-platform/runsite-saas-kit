@@ -2,12 +2,31 @@
 
 POSTGRES_PORT ?= 5432
 BACKEND_PORT ?= 8000
+MAILPIT_UI_PORT ?= 8025
 export TEST_DATABASE_URL ?= postgresql+asyncpg://saaskit:saaskit@localhost:$(POSTGRES_PORT)/saaskit_test
 
-MEMORY_CAP := systemd-run --user --scope -p MemoryMax=6G -p MemorySwapMax=0 timeout 600
+# Tests run memory-capped and time-limited where the tools exist (systemd on Linux, coreutils timeout).
+MEMORY_CAP := $(shell command -v systemd-run >/dev/null 2>&1 && systemd-run --user --scope --quiet true >/dev/null 2>&1 \
+	&& echo "systemd-run --user --scope --quiet -p MemoryMax=6G -p MemorySwapMax=0") \
+	$(shell command -v timeout >/dev/null 2>&1 && echo "timeout 600")
 IMAGE_NAME ?= runsite-saas-kit
 
-.PHONY: install dev-backend dev-frontend db-up db-down migrate makemigration test-backend test-frontend lint lint-backend lint-frontend build docker-build git-hooks secrets-scan
+.PHONY: run test check typecheck install dev-backend dev-frontend db-up db-down migrate makemigration test-backend test-frontend lint lint-backend lint-frontend build docker-build git-hooks secrets-scan
+
+run: .env db-up migrate
+	@test -d frontend/node_modules || $(MAKE) --no-print-directory install
+	@echo "App: http://localhost:5173  API: http://localhost:$(BACKEND_PORT)  Mailpit: http://localhost:$(MAILPIT_UI_PORT)  (Ctrl+C stops both)"
+	@trap 'kill 0' INT TERM; \
+	$(MAKE) --no-print-directory dev-backend & \
+	$(MAKE) --no-print-directory dev-frontend & \
+	wait
+
+.env:
+	cp .env.example .env
+
+test: test-backend test-frontend
+
+check: lint typecheck test
 
 install:
 	cd backend && uv sync
@@ -20,7 +39,8 @@ dev-frontend:
 	cd frontend && VITE_API_PROXY_TARGET=http://localhost:$(BACKEND_PORT) npm run dev
 
 db-up:
-	docker compose up -d
+	docker compose up -d --wait postgres minio
+	docker compose up -d minio-setup mailpit
 
 db-down:
 	docker compose down
@@ -45,6 +65,9 @@ lint-backend:
 
 lint-frontend:
 	cd frontend && npm run lint
+
+typecheck:
+	cd frontend && npm run typecheck
 
 build:
 	cd frontend && npm run build
